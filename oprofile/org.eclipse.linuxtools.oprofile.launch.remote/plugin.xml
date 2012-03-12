@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.6"?>
+<plugin>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            id="org.eclipse.linuxtools.oprofile.launch.remote"
+            name="Sourcery G++ Remote Application"
+            modes="profile"
+            public="true"
+            sourceLocatorId="org.eclipse.cdt.launch.DefaultSourceLocator"
+            sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer"
+            delegate="org.eclipse.linuxtools.oprofile.launch.remote.OprofileRemoteLaunchConfigurationDelegate">
+      </launchConfigurationType>
+   </extension>
+
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="org.eclipse.linuxtools.oprofile.launch.remote"
+            icon="icons/profile_run.png"
+            id="org.eclipse.linuxtools.oprofile.launch.remote.oprofileImage">
+      </launchConfigurationTypeImage>
+   </extension>
+
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.eclipse.linuxtools.oprofile.launch.remote.OprofileRemoteLaunchConfigurationTabGroup"
+            id="org.eclipse.linuxtools.oprofile.launch.remote.launchConfigurationTabGroup"
+            type="org.eclipse.linuxtools.oprofile.launch.remote">
+      </launchConfigurationTabGroup>
+   </extension>
+
+</plugin>
