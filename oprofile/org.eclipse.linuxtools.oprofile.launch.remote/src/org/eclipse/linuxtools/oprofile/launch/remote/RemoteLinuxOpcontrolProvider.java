@@ -11,13 +11,11 @@
 
 package org.eclipse.linuxtools.oprofile.launch.remote;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.util.ArrayList;
 
-import org.eclipse.cdt.debug.core.CDebugUtils;
 import org.eclipse.cdt.launch.LaunchUtils;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -26,26 +24,18 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.linuxtools.oprofile.core.OpcontrolException;
-import org.eclipse.linuxtools.oprofile.core.OprofileCorePlugin;
 import org.eclipse.linuxtools.oprofile.core.linux.LinuxOpcontrolProvider;
 import org.eclipse.linuxtools.oprofile.launch.configuration.LaunchOptions;
 import org.eclipse.rse.core.RSECorePlugin;
-import org.eclipse.rse.services.shells.HostShellProcessAdapter;
-import org.eclipse.rse.services.shells.IHostShell;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFileSubSystem;
-import org.eclipse.rse.subsystems.shells.core.model.SimpleCommandOperation;
 import org.eclipse.rse.subsystems.shells.core.subsystems.IRemoteCmdSubSystem;
 import org.eclipse.rse.subsystems.shells.core.subsystems.servicesubsystem.IServiceCommandShell;
-
-import com.codesourcery.help.DsfLaunchDelegate;
 
 /**
  * A class which encapsulates running opcontrol on remote target.
@@ -58,8 +48,6 @@ public class RemoteLinuxOpcontrolProvider extends LinuxOpcontrolProvider {
 
 	private static final String TAR_COMMAND = "tar czf";
 	
-	private static final String UNTAR_COMMAND = "tar xzf";
-
 	public final static String SUDO_PREFIX = "sudo";
 	
 	public final static String OPCONTROL_PATH = SUDO_PREFIX + " " + "/usr/bin/opcontrol";
@@ -148,14 +136,6 @@ public class RemoteLinuxOpcontrolProvider extends LinuxOpcontrolProvider {
 						)); //$NON-NLS-1$
 		}
 	}
-
-	protected String getCommandString(ArrayList<String> args) {
-		StringBuilder sb = new StringBuilder();
-		for(String s : args) {
-			sb.append(s + " ");
-		}
-		return sb.toString();
-	}
 	
 	public boolean runOparchive(LaunchOptions launchOptions) throws OpcontrolException {
 		ArrayList<String> rmArgs = new ArrayList<String>();
@@ -228,7 +208,7 @@ public class RemoteLinuxOpcontrolProvider extends LinuxOpcontrolProvider {
 	 * @param localFileName absolute name of file on local system
 	 * @throws CoreException 
 	 */
-	private void downloadFile(String remoteFileName, String localFileName, IProgressMonitor monitor) throws CoreException {
+	protected void downloadFile(String remoteFileName, String localFileName, IProgressMonitor monitor) throws CoreException {
 		if (!RSECorePlugin.isInitComplete(RSECorePlugin.INIT_MODEL)) {
 			monitor.subTask("Initializing RSE"); //$NON-NLS-1$
 			try {
@@ -260,4 +240,12 @@ public class RemoteLinuxOpcontrolProvider extends LinuxOpcontrolProvider {
 		
 	}
 	
+	public InputStream runOpReport(ArrayList<String> args) throws OpcontrolException {
+		IPath pluginDir = OprofileRemoteLaunchPlugin.getDefault().getStateLocation();
+		IPath sessionDir = pluginDir.append(OPARCHIVE_TMP_DIR.substring(1)).append(OPARCHIVE_DIR_NAME);
+		sessionDir = sessionDir.append("var").append("lib").append("oprofile");
+		args.add("--session-dir=" + sessionDir.toOSString());
+		return super.runOpReport(args);
+	}
+
 }

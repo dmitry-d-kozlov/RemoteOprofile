@@ -18,13 +18,11 @@ import org.eclipse.cdt.launch.LaunchUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.ILaunchesListener2;
-import org.eclipse.linuxtools.oprofile.core.IOpcontrolProvider;
 import org.eclipse.linuxtools.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.oprofile.core.OprofileCorePlugin;
 import org.eclipse.linuxtools.oprofile.core.daemon.OprofileDaemonEvent;
@@ -50,6 +48,7 @@ public class OprofileRemoteLaunchConfigurationDelegate extends AbstractOprofileL
 			IPath exePath = CDebugUtils.verifyProgramPath(config);
 
 			opc = OprofileRemoteLaunchPlugin.getDefault().getOpcontrolProvider(config, launch, monitor);
+			OprofileCorePlugin.getDefault().setOpcontrolProvider(opc);
 
 			// Upload program binary to target
 			String remoteProgram = DsfLaunchDelegate.uploadApplication(config, monitor, exePath);
