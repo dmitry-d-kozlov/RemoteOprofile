@@ -7,8 +7,12 @@
  *
  * Contributors:
  *    Keith Seitz <keiths@redhat.com> - initial API and implementation
+ *    Dmitry Kozlov <ddk@codesourcery.com> - added runOpReport
  *******************************************************************************/ 
 package org.eclipse.linuxtools.internal.oprofile.core;
+
+import java.io.InputStream;
+import java.util.ArrayList;
 
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonOptions;
@@ -90,4 +94,12 @@ public interface IOpcontrolProvider {
 	public void deleteSession (String sessionName, String sessionEvent) throws OpcontrolException;
 
 	public boolean status() throws OpcontrolException;
+
+	/**
+     * Run opreport command
+     * @param args opreport arguments except -X flag, which is added
+     * @return
+	 * @throws OpcontrolException
+	 */
+	public InputStream runOpReport(ArrayList<String> args) throws OpcontrolException;
 }

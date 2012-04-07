@@ -8,30 +8,38 @@
  * Contributors:
  *    Keith Seitz <keiths@redhat.com> - initial API and implementation
  *    Kent Sebastian <ksebasti@redhat.com>
+ *    Dmitry Kozlov <ddk@codesourcery.com> - added runOpReport
  *******************************************************************************/ 
 package org.eclipse.linuxtools.internal.oprofile.core.linux;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.internal.oprofile.core.IOpcontrolProvider;
 import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.internal.oprofile.core.Oprofile;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileCorePlugin;
+import org.eclipse.linuxtools.internal.oprofile.core.OprofileProperties;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonOptions;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.sessions.SessionManager;
 import org.eclipse.linuxtools.tools.launch.core.factory.RuntimeProcessFactory;
 import org.eclipse.linuxtools.tools.launch.core.properties.LinuxtoolsPathProperty;
+import org.eclipse.osgi.util.NLS;
 
 /**
  * A class which encapsulates running opcontrol.
@@ -411,6 +419,84 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 		
 		//callgraph depth
 		args.add(OPD_CALLGRAPH_DEPTH + options.getCallgraphDepth());
+	}
+
+	/**
+     * Run opreport command
+     * @param args opreport arguments except -X flag, which is added by this method 
+     * @return
+	 * @throws OpcontrolException
+	 */
+	public InputStream runOpReport(ArrayList<String> args) throws OpcontrolException {
+		args.add(0, "opreport"); //$NON-NLS-1$
+		args.add(1, "-X");       //$NON-NLS-1$
+
+		final StringBuilder output = new StringBuilder();
+		final StringBuilder errorOutput = new StringBuilder();
+		Thread errReaderThread = null;
+		try {
+			Process p = RuntimeProcessFactory.getFactory().exec(args.toArray(new String[]{}), Oprofile.getCurrentProject());
+
+			final BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			final BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			try {
+				// Read output of opreport. We need to do this, since this might
+				// cause the plug-in to hang. See Eclipse bug 341621 for more info.
+				errReaderThread = new Thread(new Runnable() {
+					      public void run(){
+								String line = null;
+								try {
+									while (((line = stdError.readLine()) != null)) {
+										errorOutput.append(line + System.getProperty("line.separator")); //$NON-NLS-1$
+									}
+								} catch (IOException e) {
+								}
+					      }
+					    });
+				errReaderThread.start();
+
+				String s = null;
+				while ((s = stdInput.readLine()) != null) {
+					output.append(s + System.getProperty("line.separator")); //$NON-NLS-1$
+				}
+
+			} finally {
+				stdInput.close();
+				stdError.close();
+
+				if(errReaderThread != null) {
+					try {
+						errReaderThread.join();
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+			int exitCode = p.waitFor();
+			if (exitCode != 0){
+				throw new OpcontrolException(new Status(IStatus.ERROR, OprofileCorePlugin.getId(),
+					NLS.bind(OprofileProperties.getString("opreport.error.nonZeroExitCode"),exitCode), null));  //$NON-NLS-1$ 
+			}
+		} catch (IOException e) {
+			throw new OpcontrolException(new Status(IStatus.ERROR, OprofileCorePlugin.getId(),
+				OprofileProperties.getString("opreport.error.ioException"), e));         //$NON-NLS-1$
+		} catch (InterruptedException e) {
+		}
+
+		if (!errorOutput.toString().trim().equals("")) { //$NON-NLS-1$
+			throw new OpcontrolException(new Status(IStatus.ERROR, OprofileCorePlugin.getId(),
+				NLS.bind(OprofileProperties.getString("opreport.error.nonEmptyStderr"), errorOutput.toString().trim()))); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		// convert the string to inputstream to pass 
+		InputStream is = null;
+		try {
+			is = new ByteArrayInputStream(output.toString().getBytes("UTF-8")); //$NON-NLS-1$
+		} catch (UnsupportedEncodingException e) {
+			throw new OpcontrolException(new Status(IStatus.ERROR, OprofileCorePlugin.getId(),
+				OprofileProperties.getString("opreport.error.cantConvertEncoding"), e)); //$NON-NLS-1$
+		}
+
+		return is;
 	}
 
 }
