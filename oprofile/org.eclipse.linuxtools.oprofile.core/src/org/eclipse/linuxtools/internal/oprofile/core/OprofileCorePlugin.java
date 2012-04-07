@@ -8,6 +8,7 @@
  * Contributors:
  *    Keith Seitz <keiths@redhat.com> - initial API and implementation
  *    Kent Sebastian <ksebasti@redhat.com> - 
+ *    Dmitry Kozlov <ddk@codesourcery.com> - add setOpcontrolProvider
  *******************************************************************************/ 
 
 package org.eclipse.linuxtools.internal.oprofile.core;
@@ -38,6 +39,7 @@ public class OprofileCorePlugin extends Plugin {
 	//The shared instance.
 	private static OprofileCorePlugin plugin;
 	private IOpxmlProvider opxmlProvider;
+	private IOpcontrolProvider opcontrolProvider = null;
 
 	public static final String DEBUG_PRINT_PREFIX = "DEBUG: "; //$NON-NLS-1$
 	
@@ -93,36 +95,21 @@ public class OprofileCorePlugin extends Plugin {
 	 * @throws OpcontrolException
 	 */
 	public IOpcontrolProvider getOpcontrolProvider() throws OpcontrolException {
-//		Exception except = null;
-//		
-//		if (_opcontrol == null) {
-//			IExtensionRegistry registry = Platform.getExtensionRegistry();
-//			IExtensionPoint extension = registry.getExtensionPoint(PLUGIN_ID, "OpcontrolProvider"); //$NON-NLS-1$
-//			if (extension != null) {
-//				IExtension[] extensions = extension.getExtensions();
-//				IConfigurationElement[] configElements = extensions[0].getConfigurationElements();
-//				if (configElements.length != 0) {
-//					try {
-//						_opcontrol = (IOpcontrolProvider) configElements[0].createExecutableExtension("class"); //$NON-NLS-1$
-//					} catch (CoreException ce) {
-//						except = ce;
-//					}
-//				}
-//			}
-//		}
-//		
-//		// If there was a problem finding opcontrol, throw an exception
-//		if (_opcontrol == null) {
-//			String msg = getResourceString("opcontrolProvider.error.missing"); //$NON-NLS-1$
-//			Status status = new Status(IStatus.ERROR, getId(), IStatus.OK, msg, except);
-//			throw new OpcontrolException(status);
-//		}
-//
-//		return _opcontrol;
-		
-		return new LinuxOpcontrolProvider();
+		if (opcontrolProvider == null) {
+			opcontrolProvider =  new LinuxOpcontrolProvider();
+		}
+		return opcontrolProvider;
 	}
-	
+
+	/**
+	 * Set up the instance of IOpcontrolProvider
+	 * @return the OpcontrolProvider registered with the plugin
+	 * @throws OpcontrolException
+	 */
+	public void setOpcontrolProvider(IOpcontrolProvider provider) {
+		opcontrolProvider = provider;
+	}
+
 	public static IStatus createErrorStatus(String errorClassString, Exception e) {
 		String statusMessage = OprofileProperties.getString(errorClassString + ".error.statusMessage"); //$NON-NLS-1$
 
@@ -132,7 +119,7 @@ public class OprofileCorePlugin extends Plugin {
 			return new Status(IStatus.ERROR, getId(), IStatus.OK, statusMessage, e);
 		}
 	}
-	
+
 	public static void showErrorDialog(String errorClassString, CoreException ex) {
 		final IStatus status;
 		final String dialogTitle = OprofileProperties.getString(errorClassString + ".error.dialog.title"); //$NON-NLS-1$
@@ -152,7 +139,7 @@ public class OprofileCorePlugin extends Plugin {
 		});
 
 	}
-	
+
 	/**
 	 * 
 	 * @return {@code true} when platform was started in debug mode ({@code -debug} switch)
