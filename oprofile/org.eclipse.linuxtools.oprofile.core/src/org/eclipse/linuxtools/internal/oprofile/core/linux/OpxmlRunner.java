@@ -8,19 +8,18 @@
  * Contributors:
  *    Keith Seitz <keiths@redhat.com> - initial API and implementation
  *    Kent Sebastian <ksebasti@redhat.com> - 
+ *    Dmitry Kozlov <ddk@codesourcery.com> - added calls to opreport
  *******************************************************************************/ 
 package org.eclipse.linuxtools.internal.oprofile.core.linux;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -28,10 +27,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.eclipse.core.runtime.Status;
-import org.eclipse.linuxtools.internal.oprofile.core.Oprofile;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileCorePlugin;
-import org.eclipse.linuxtools.internal.oprofile.core.OprofileProperties;
 import org.eclipse.linuxtools.internal.oprofile.core.OpxmlException;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.AbstractDataAdapter;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.OprofileSAXHandler;
@@ -40,8 +38,6 @@ import org.eclipse.linuxtools.internal.oprofile.core.opxml.checkevent.CheckEvent
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.info.InfoAdapter;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.modeldata.ModelDataAdapter;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.sessions.SessionManager;
-import org.eclipse.linuxtools.tools.launch.core.factory.RuntimeProcessFactory;
-import org.eclipse.osgi.util.NLS;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -182,65 +178,16 @@ public class OpxmlRunner {
 		return new File (SessionManager.OPXML_PREFIX + fileName);
 	}
 	
-	private boolean handleModelData (String [] args){
-		Process p;
+	private boolean handleModelData(String[] args) {
 		try {
 			ArrayList<String> cmd = new ArrayList<String>();
-			cmd.add("opreport"); //$NON-NLS-1$
-			cmd.add("-Xdg"); //$NON-NLS-1$
+			cmd.add("-dg"); //$NON-NLS-1$
 			if (!InfoAdapter.hasTimerSupport()){
 				cmd.add("event:" + args[1]); //$NON-NLS-1$
 			}
-			String [] a = {};
-			p = RuntimeProcessFactory.getFactory().exec(cmd.toArray(a), Oprofile.getCurrentProject());
-			
-			StringBuilder output = new StringBuilder();
-			StringBuilder errorOutput = new StringBuilder();
-			String s = null;
-			try {
-				BufferedReader stdInput = new BufferedReader(new InputStreamReader(
-						p.getInputStream()));
-				BufferedReader stdError = new BufferedReader(new InputStreamReader(
-						p.getErrorStream()));
-				try {
-					// Read output of opreport. We need to do this, since this might
-					// cause the plug-in to hang. See Eclipse bug 341621 for more info.
-					// FIXME: Both of those while loops should really be done in two separate
-					// threads, so that we avoid this very problem when the error input
-					// stream buffer fills up.
-					while ((s = stdInput.readLine()) != null) {
-						output.append(s + System.getProperty("line.separator")); //$NON-NLS-1$
-					}
-					while ((s = stdError.readLine()) != null) {
-						errorOutput.append(s + System.getProperty("line.separator")); //$NON-NLS-1$
-					}
-				} finally {
-					stdInput.close();
-					stdError.close();
-				}
-				if (!errorOutput.toString().trim().equals("")) { //$NON-NLS-1$
-				OprofileCorePlugin
-						.log(Status.ERROR,
-								NLS.bind(
-										OprofileProperties
-												.getString("process.log.stderr"), "opreport", errorOutput.toString().trim())); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} 
 
-			
-			// convert the string to inputstream to pass 
-			InputStream is = null;
-			try {
-				is = new ByteArrayInputStream(output.toString().getBytes("UTF-8"));
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
+			InputStream is = OprofileCorePlugin.getDefault().getOpcontrolProvider().runOpReport(cmd);
 
-			if (p.waitFor() != 0){
-				return false;
-			}
 			ModelDataAdapter mda = new ModelDataAdapter(is);
 			if (! mda.isParseable()){
 				return false;
@@ -248,11 +195,8 @@ public class OpxmlRunner {
 			mda.process();
 			BufferedReader bi = new BufferedReader(new InputStreamReader(mda.getInputStream()));
 			saveOpxmlToFile(bi, args);
-		} catch (IOException e) {
-			e.printStackTrace();
-			OprofileCorePlugin.showErrorDialog("opxmlParse", null); //$NON-NLS-1$
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} catch (OpcontrolException e) {
+			OprofileCorePlugin.showErrorDialog("opxmlParse", e); //$NON-NLS-1$
 		}
 		return true;
 	}
@@ -272,95 +216,52 @@ public class OpxmlRunner {
 		}
 	}
 
-	private String[] getEventNames (){
+	private String[] getEventNames() {
 		String [] ret = null;
 		try {
-			String cmd[] = {"opreport", "-X", "-d"};
+			ArrayList<String> cmd = new ArrayList<String>();
+			cmd.add("-d"); //$NON-NLS-1$
 			
-			Process p = RuntimeProcessFactory.getFactory().exec(cmd, Oprofile.getCurrentProject());
-			StringBuilder output = new StringBuilder();
-			StringBuilder errorOutput = new StringBuilder();
-			String s = null;
-			try {
-				BufferedReader stdInput = new BufferedReader(new InputStreamReader(
-						p.getInputStream()));
-				BufferedReader stdError = new BufferedReader(new InputStreamReader(
-						p.getErrorStream()));
-				try {
-					// Read output of opreport. We need to do this, since this might
-					// cause the plug-in to hang. See Eclipse bug 341621 for more info.
-					// FIXME: Both of those while loops should really be done in two separate
-					// threads, so that we avoid this very problem when the error input
-					// stream buffer fills up.
-					while ((s = stdInput.readLine()) != null) {
-						output.append(s + System.getProperty("line.separator")); //$NON-NLS-1$
-					}
-					while ((s = stdError.readLine()) != null) {
-						errorOutput.append(s + System.getProperty("line.separator")); //$NON-NLS-1$
-					}
-				} finally {
-					stdInput.close();
-					stdError.close();
-				}
-				if (!errorOutput.toString().trim().equals("")) { //$NON-NLS-1$
-					OprofileCorePlugin
-							.log(Status.ERROR,
-									NLS.bind(
-											OprofileProperties
-													.getString("process.log.stderr"), "opreport", errorOutput.toString().trim())); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} 
+			InputStream is = OprofileCorePlugin.getDefault().getOpcontrolProvider().runOpReport(cmd);
+			
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder;
+			builder = factory.newDocumentBuilder();
+			Document doc = builder.parse(is);
+			Element root = (Element) doc.getElementsByTagName(ModelDataAdapter.PROFILE).item(0);
 
-			
-			// convert the string to inputstream to pass to builder.parse
-			InputStream is = null;
-			try {
-				is = new ByteArrayInputStream(output.toString().getBytes("UTF-8"));
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+			String eventOrTimerSetup;
+			String eventOrTimerName;
+
+			// Determine if we are in timer-mode or not as the XML will vary
+			if (!InfoAdapter.hasTimerSupport()) {
+				eventOrTimerSetup = ModelDataAdapter.EVENT_SETUP;
+				eventOrTimerName = ModelDataAdapter.EVENT_NAME;
+			} else {
+				eventOrTimerSetup = ModelDataAdapter.TIMER_SETUP;
+				eventOrTimerName = ModelDataAdapter.RTC_INTERRUPTS;
 			}
-			
-			if (p.waitFor() == 0){
-				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder builder;
-				builder = factory.newDocumentBuilder();
-				Document doc = builder.parse(is);
-				Element root = (Element) doc.getElementsByTagName(ModelDataAdapter.PROFILE).item(0);
 
-				String eventOrTimerSetup;
-				String eventOrTimerName;
+			Element setupTag = (Element) root.getElementsByTagName(ModelDataAdapter.SETUP).item(0);
+			NodeList eventSetupList = setupTag.getElementsByTagName(eventOrTimerSetup);
 
-				// Determine if we are in timer-mode or not as the XML will vary
-				if (!InfoAdapter.hasTimerSupport()){
-					eventOrTimerSetup = ModelDataAdapter.EVENT_SETUP;
-					eventOrTimerName = ModelDataAdapter.EVENT_NAME;
-				}else{
-					eventOrTimerSetup = ModelDataAdapter.TIMER_SETUP;
-					eventOrTimerName = ModelDataAdapter.RTC_INTERRUPTS;
-				}
-
-				Element setupTag = (Element) root.getElementsByTagName(ModelDataAdapter.SETUP).item(0);
-				NodeList eventSetupList = setupTag.getElementsByTagName(eventOrTimerSetup);
-
-				// get the event names for the current session
-				ret = new String[eventSetupList.getLength()];
-				for (int i = 0; i < eventSetupList.getLength(); i++) {
-					Element elm = (Element) eventSetupList.item(i);
-					ret[i] = elm.getAttribute(eventOrTimerName);
-				}
+			// get the event names for the current session
+			ret = new String[eventSetupList.getLength()];
+			for (int i = 0; i < eventSetupList.getLength(); i++) {
+				Element elm = (Element) eventSetupList.item(i);
+				ret[i] = elm.getAttribute(eventOrTimerName);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			OprofileCorePlugin.log(IStatus.ERROR, e.getMessage(), e);
 			OprofileCorePlugin.showErrorDialog("opxmlParse", null); //$NON-NLS-1$
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			OprofileCorePlugin.log(IStatus.ERROR, e.getMessage(), e);
 		} catch (SAXException e) {
-			e.printStackTrace();
+			OprofileCorePlugin.log(IStatus.ERROR, e.getMessage(), e);
 			OprofileCorePlugin.showErrorDialog("opxmlSAXParseException", null); //$NON-NLS-1$
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} catch (OpcontrolException e) {
+			OprofileCorePlugin.log(IStatus.ERROR, e.getMessage(), e);
+			OprofileCorePlugin.showErrorDialog("opreportRunError", e); //$NON-NLS-1$
 		}
 		return ret;
 	}
