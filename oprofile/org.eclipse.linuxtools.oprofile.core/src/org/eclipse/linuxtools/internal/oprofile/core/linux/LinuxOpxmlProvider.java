@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.linuxtools.internal.oprofile.core.IOpxmlProvider;
+import org.eclipse.linuxtools.internal.oprofile.core.IOprofileDataProvider;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpInfo;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelImage;
@@ -27,7 +27,7 @@ import org.eclipse.linuxtools.internal.oprofile.core.opxml.sessions.SessionsProc
 /**
  * A class which implements the IOpxmlProvider interface for running opxml.
  */
-public class LinuxOpxmlProvider implements IOpxmlProvider {
+public class LinuxOpxmlProvider implements IOprofileDataProvider {
 	
 	public IRunnableWithProgress info(final OpInfo info) {
 		return new OpInfoRunner(info);

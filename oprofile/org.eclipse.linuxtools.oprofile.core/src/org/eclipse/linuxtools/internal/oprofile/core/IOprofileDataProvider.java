@@ -7,7 +7,9 @@
  *
  * Contributors:
  *    Keith Seitz <keiths@redhat.com> - initial API and implementation
- *    Kent Sebastian <ksebasti@redhat.com> - 
+ *    Kent Sebastian <ksebasti@redhat.com> -
+ *    Dmitry Kozlov <ddk@codesourcery.com> - Generalise interface to be independent 
+ *    										 from underline opxml layer 
  *******************************************************************************/ 
 package org.eclipse.linuxtools.internal.oprofile.core;
 
@@ -19,10 +21,9 @@ import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelImage;
 
 /**
- * Interface for the core to utilize opxml. Platform plugins should define/register an
- * OpxmlProvider for the core to use.
+ * Interface to query data collected by oprofile.  
  */
-public interface IOpxmlProvider {
+public interface IOprofileDataProvider {
 	
 	/**
 	 * Returns an <code>IRunnableWithProgress</code> that fetches generic information from opxml
