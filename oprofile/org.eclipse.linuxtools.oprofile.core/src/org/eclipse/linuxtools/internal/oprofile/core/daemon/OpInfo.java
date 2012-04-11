@@ -18,7 +18,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileCorePlugin;
-import org.eclipse.linuxtools.internal.oprofile.core.OpxmlException;
+import org.eclipse.linuxtools.internal.oprofile.core.OprofileDataException;
 import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpxmlProvider.OpInfoRunner;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.info.DefaultsProcessor;
 
@@ -81,13 +81,13 @@ public class OpInfo {
 		OpInfo info = new OpInfo();
 
 		try {
-			OpInfoRunner opxml = (OpInfoRunner) OprofileCorePlugin.getDefault().getOpxmlProvider().info(info);
+			OpInfoRunner opxml = (OpInfoRunner) OprofileCorePlugin.getDefault().getOprofileDataProvider().info(info);
 			boolean ret = opxml.run0(null);
 			if (ret == false) 
 				info = null;
 		} catch (InvocationTargetException e) {
 		} catch (InterruptedException e) {
-		} catch (OpxmlException e) {
+		} catch (OprofileDataException e) {
 			OprofileCorePlugin.showErrorDialog("opxmlProvider", e); //$NON-NLS-1$
 		}
 		

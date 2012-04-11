@@ -38,8 +38,9 @@ public class OprofileCorePlugin extends Plugin {
 
 	//The shared instance.
 	private static OprofileCorePlugin plugin;
-	private IOprofileDataProvider opxmlProvider;
-	private IOpcontrolProvider opcontrolProvider = null;
+	private IOprofileDataProvider opDataProvider;
+	private IOpcontrolProvider opControlProvider;
+	private IOprofileInfoProvider opInfoProvider;
 
 	public static final String DEBUG_PRINT_PREFIX = "DEBUG: "; //$NON-NLS-1$
 	
@@ -78,36 +79,60 @@ public class OprofileCorePlugin extends Plugin {
 	public static String getId() {
 		return PLUGIN_ID;
 	}
-	
+
+	public boolean isOprofileInitialized() {
+		return opControlProvider != null && opDataProvider != null & opInfoProvider != null;
+	}
+
 	/**
-	 * Returns the OpxmlProvider registered with the plugin or throws an exception
-	 * @return the OpxmlProvider
-	 * @throws OpxmlException
+ 	 * Returns the OprofileDataProvider registered with the plugin or throws an exception
+     * @return the OprofileDataProvider
+	 * @throws OprofileDataException
 	 */
-	public IOprofileDataProvider getOpxmlProvider() throws OpxmlException {
-		opxmlProvider = new LinuxOpxmlProvider();
-		return opxmlProvider;
+	public IOprofileDataProvider getOprofileDataProvider() throws OprofileDataException {
+		opDataProvider = new LinuxOpxmlProvider();
+		return opDataProvider;
 	}
 	
+	public void setOprofileDataProvider(IOprofileDataProvider provider) {
+		opDataProvider = provider;
+	}
+
+	/** 
+	 * Get instance of IOprofileInfoProvider
+	 * @return instance of IOprofileInfoProvider
+	 */
+	public IOprofileInfoProvider getOprofileInfoProvider() {
+		return opInfoProvider;
+	}
+
+	/**
+	 * Set up the instance of IOprofileInfoProvider
+	 * @return the IOprofileInfoProvider registered with the plugin
+	 * @throws OpcontrolException
+	 */
+	public void setOprofileInfoProvider(IOprofileInfoProvider provider) {
+		opInfoProvider = provider;
+	}
+
 	/**
 	 * Returns the registered opcontrol provider or throws an exception
 	 * @return the OpcontrolProvider registered with the plugin
 	 * @throws OpcontrolException
 	 */
 	public IOpcontrolProvider getOpcontrolProvider() throws OpcontrolException {
-		if (opcontrolProvider == null) {
-			opcontrolProvider =  new LinuxOpcontrolProvider();
+		if (opControlProvider == null) {
+			opControlProvider =  new LinuxOpcontrolProvider();
 		}
-		return opcontrolProvider;
+		return opControlProvider;
 	}
 
 	/**
 	 * Set up the instance of IOpcontrolProvider
 	 * @return the OpcontrolProvider registered with the plugin
-	 * @throws OpcontrolException
 	 */
 	public void setOpcontrolProvider(IOpcontrolProvider provider) {
-		opcontrolProvider = provider;
+		opControlProvider = provider;
 	}
 
 	public static IStatus createErrorStatus(String errorClassString, Exception e) {

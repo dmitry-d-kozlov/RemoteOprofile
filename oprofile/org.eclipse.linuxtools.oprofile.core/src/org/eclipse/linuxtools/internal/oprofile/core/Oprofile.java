@@ -180,11 +180,11 @@ public class Oprofile
 	public static Boolean checkEvent(int ctr, String event, int um) {
 		int[] validResult = new int[1];
 		try {
-			IRunnableWithProgress opxml = OprofileCorePlugin.getDefault().getOpxmlProvider().checkEvents(ctr, event, um, validResult);
+			IRunnableWithProgress opxml = OprofileCorePlugin.getDefault().getOprofileDataProvider().checkEvents(ctr, event, um, validResult);
 			opxml.run(null);
 		} catch (InvocationTargetException e) {
 		} catch (InterruptedException e) {
-		} catch (OpxmlException e) {
+		} catch (OprofileDataException e) {
 			OprofileCorePlugin.showErrorDialog("opxmlProvider", e); //$NON-NLS-1$
 			return null;
 		}
@@ -202,13 +202,13 @@ public class Oprofile
 		
 		ArrayList<OpModelEvent> sessionList = new ArrayList<OpModelEvent>();
 		try {
-			IRunnableWithProgress opxml = OprofileCorePlugin.getDefault().getOpxmlProvider().sessions(sessionList);
+			IRunnableWithProgress opxml = OprofileCorePlugin.getDefault().getOprofileDataProvider().sessions(sessionList);
 			opxml.run(null);
 			events = new OpModelEvent[sessionList.size()];
 			sessionList.toArray(events);
 		} catch (InvocationTargetException e) {
 		} catch (InterruptedException e) {
-		} catch (OpxmlException e) {
+		} catch (OprofileDataException e) {
 			OprofileCorePlugin.showErrorDialog("opxmlProvider", e); //$NON-NLS-1$
 		}
 		return events;
@@ -224,11 +224,11 @@ public class Oprofile
 		
 		final IRunnableWithProgress opxml;
 		try {
-			opxml = OprofileCorePlugin.getDefault().getOpxmlProvider().modelData(eventName, sessionName, image);
+			opxml = OprofileCorePlugin.getDefault().getOprofileDataProvider().modelData(eventName, sessionName, image);
 			opxml.run(null);
 		} catch (InvocationTargetException e) { 
 		} catch (InterruptedException e) { 
-		} catch (OpxmlException e) {
+		} catch (OprofileDataException e) {
 			OprofileCorePlugin.showErrorDialog("opxmlProvider", e); //$NON-NLS-1$
 			return null;
 		}
