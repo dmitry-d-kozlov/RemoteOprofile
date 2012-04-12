@@ -31,12 +31,6 @@ import org.eclipse.linuxtools.tools.launch.core.properties.LinuxtoolsPathPropert
  */
 public class Oprofile
 {
-	// Ugh. Need to know whether the module is loaded without running oprofile commands...
-	private static final String[] OPROFILE_CPU_TYPE_FILES = {
-		"/dev/oprofile/cpu_type", //$NON-NLS-1$
-		"/proc/sys/dev/oprofile/cpu_type"  //$NON-NLS-1$
-	};
-	
 	// Oprofile information
 	private static OpInfo info;
 	
@@ -75,8 +69,8 @@ public class Oprofile
 	// succesfully call into the oprofile wrapper library without causing it to print out
 	// a lot of warnings).
 	private static boolean isKernelModuleLoaded() {
-		for (int i = 0; i < OPROFILE_CPU_TYPE_FILES.length; ++i) {
-			File f = new File(OPROFILE_CPU_TYPE_FILES[i]);
+		for (int i = 0; i < OprofileConstants.OPROFILE_CPU_TYPE_FILES.length; ++i) {
+			File f = new File(OprofileConstants.OPROFILE_CPU_TYPE_FILES[i]);
 			if (f.exists())
 				return true;
 		}

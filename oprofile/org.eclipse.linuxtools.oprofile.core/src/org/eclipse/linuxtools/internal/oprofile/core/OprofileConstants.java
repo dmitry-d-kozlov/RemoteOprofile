@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2011, 2012 Mentor Graphics Corp.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Dmitry Kozlov <ddk@codesourcery.com> - initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.linuxtools.internal.oprofile.core;
 
 public class OprofileConstants {
@@ -32,5 +43,19 @@ public class OprofileConstants {
 	public static final String OPD_DUMP = "--dump"; //$NON-NLS-1$
 	// Stop data collection
 	public static final String OPD_STOP_COLLECTION = "--stop"; //$NON-NLS-1$
+	// Stop data collection and stop daemon
+	public static final String OPD_SHUTDOWN = "--shutdown"; //$NON-NLS-1$
+	// Clear out data from current session
+	public static final String OPD_RESET = "--reset"; //$NON-NLS-1$
+	// Unload the oprofile kernel module and oprofilefs
+	public static final String OPD_DEINIT_MODULE = "--deinit"; //$NON-NLS-1$
+	public static final String OPCONTROL_EXECUTABLE = "opcontrol";
+	// Location of opcontrol security wrapper
+	public static final String OPCONTROL_REL_PATH = "natives/linux/scripts/" + OPCONTROL_EXECUTABLE; //$NON-NLS-1$
+	// Ugh. Need to know whether the module is loaded without running oprofile commands...
+	static final String[] OPROFILE_CPU_TYPE_FILES = {
+		"/dev/oprofile/cpu_type", //$NON-NLS-1$
+		"/proc/sys/dev/oprofile/cpu_type"  //$NON-NLS-1$
+	};
 
 }

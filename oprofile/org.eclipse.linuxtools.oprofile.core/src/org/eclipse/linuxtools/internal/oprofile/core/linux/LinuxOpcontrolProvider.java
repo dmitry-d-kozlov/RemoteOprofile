@@ -46,22 +46,8 @@ import org.eclipse.osgi.util.NLS;
  * A class which encapsulates running opcontrol.
  */
 public class LinuxOpcontrolProvider implements IOpcontrolProvider {
-	private static final String OPCONTROL_EXECUTABLE = "opcontrol";
-	
-	// Location of opcontrol security wrapper
-	private static final String OPCONTROL_REL_PATH = "natives/linux/scripts/" + OPCONTROL_EXECUTABLE; //$NON-NLS-1$
-	
 	private final String opcontrolProgram;
 
-	// Stop data collection and stop daemon
-	private static final String OPD_SHUTDOWN = "--shutdown"; //$NON-NLS-1$
-	
-	// Clear out data from current session
-	private static final String OPD_RESET = "--reset"; //$NON-NLS-1$
-	
-	// Unload the oprofile kernel module and oprofilefs
-	private static final String OPD_DEINIT_MODULE = "--deinit"; //$NON-NLS-1$
-	
 	// Logging verbosity. Specified with setupDaemon.
 	//--verbosity=all generates WAY too much stuff in the log
 	private String verbosity = ""; //$NON-NLS-1$
@@ -76,7 +62,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	 * @throws OpcontrolException
 	 */
 	public void deinitModule() throws OpcontrolException {
-		runOpcontrol(OPD_DEINIT_MODULE);
+		runOpcontrol(OprofileConstants.OPD_DEINIT_MODULE);
 	}
 	
 	/**
@@ -100,7 +86,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	 * @throws OpcontrolException
 	 */
 	public void reset() throws OpcontrolException {
-		runOpcontrol(OPD_RESET);
+		runOpcontrol(OprofileConstants.OPD_RESET);
 	}
 	
 	/**
@@ -171,7 +157,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	 * @throws OpcontrolException
 	 */
 	public void shutdownDaemon() throws OpcontrolException {
-		runOpcontrol(OPD_SHUTDOWN);
+		runOpcontrol(OprofileConstants.OPD_SHUTDOWN);
 	}
 	
 	/**
@@ -229,7 +215,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 		if(project == null || LinuxtoolsPathProperty.getInstance().getLinuxtoolsPath(project).equals("")){
 			args.add(0, opcontrolProgram);
 		} else{
-			args.add(0, OPCONTROL_EXECUTABLE);
+			args.add(0, OprofileConstants.OPCONTROL_EXECUTABLE);
 		}
 
 		// Verbosity hack. If --start or --start-daemon, add verbosity, if set
@@ -313,7 +299,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	private static String findOpcontrol() throws OpcontrolException {
 		IProject project = Oprofile.getCurrentProject();		
 		URL url = FileLocator.find(Platform.getBundle(OprofileCorePlugin
-				.getId()), new Path(OPCONTROL_REL_PATH), null);
+				.getId()), new Path(OprofileConstants.OPCONTROL_REL_PATH), null);
 
 		if (url != null) {
 			try {
