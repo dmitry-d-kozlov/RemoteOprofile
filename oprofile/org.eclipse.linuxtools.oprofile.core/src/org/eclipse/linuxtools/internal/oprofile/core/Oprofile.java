@@ -19,6 +19,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpInfo;
 import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpcontrolProvider;
+import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpxmlProvider.OpInfoRunner;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelImage;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.checkevent.CheckEventsProcessor;
@@ -161,5 +162,27 @@ public class Oprofile
 		}
 
 		return image;
+	}
+
+	/**
+	 * Return all of Oprofile's generic information.
+	 * @return a class containing the information
+	 */
+	public static OpInfo getInfo() {
+		// Run opmxl and get the static information
+		OpInfo info = new OpInfo();
+
+		try {
+			OpInfoRunner opxml = (OpInfoRunner) OprofileCorePlugin.getDefault().getOprofileDataProvider().info(info);
+			boolean ret = opxml.run0(null);
+			if (ret == false)
+				info = null;
+		} catch (InvocationTargetException e) {
+		} catch (InterruptedException e) {
+		} catch (OprofileDataException e) {
+			OprofileCorePlugin.showErrorDialog("opxmlProvider", e); //$NON-NLS-1$
+		}
+
+		return info;
 	}
 }

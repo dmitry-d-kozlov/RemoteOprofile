@@ -35,7 +35,6 @@ import org.eclipse.linuxtools.internal.oprofile.core.OprofileConstants;
 import org.eclipse.linuxtools.internal.oprofile.core.Oprofile;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileCorePlugin;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileProperties;
-import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpInfo;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonOptions;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.sessions.SessionManager;
@@ -483,7 +482,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	// Initializes static data for oprofile.
 	public static void initializeOprofileCore () {
 		if (isKernelModuleLoaded()){
-			Oprofile.info = OpInfo.getInfo();
+			Oprofile.info = Oprofile.getInfo();
 
 			if (Oprofile.info == null) {
 				throw new ExceptionInInitializerError(OprofileProperties.getString("fatal.opinfoNotParsed")); //$NON-NLS-1$
