@@ -11,7 +11,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.linuxtools.internal.oprofile.core.Oprofile;
+import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpcontrolProvider;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.info.InfoAdapter;
 import org.eclipse.linuxtools.tools.launch.core.factory.RuntimeProcessFactory;
 import org.w3c.dom.Document;
@@ -81,7 +81,7 @@ public class EventIdCache {
 	 */
 	private void readXML() {
 		try {
-			Process p = RuntimeProcessFactory.getFactory().exec(OPHELP + " " + "-X", Oprofile.getCurrentProject());
+			Process p = RuntimeProcessFactory.getFactory().exec(OPHELP + " " + "-X", LinuxOpcontrolProvider.getCurrentProject());
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder;
 			try {

@@ -15,7 +15,6 @@ package org.eclipse.linuxtools.internal.oprofile.core;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpInfo;
@@ -23,7 +22,6 @@ import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpcontrolProvide
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelImage;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.checkevent.CheckEventsProcessor;
-import org.eclipse.linuxtools.tools.launch.core.properties.LinuxtoolsPathProperty;
 
 
 /**
@@ -33,9 +31,6 @@ public class Oprofile
 {
 	// Oprofile information
 	public static OpInfo info;
-	
-	// Project that will be profiled. 
-	public static IProject currentProject;
 	
 	/**
 	 * Queries oprofile for the number of counters on the current CPU.
@@ -166,32 +161,5 @@ public class Oprofile
 		}
 
 		return image;
-	}
-	
-	// Reloads oprofile modules by calling 'opcontrol --deinit' and 'opcontrol --init'
-	public static void setCurrentProject(IProject project){
-		
-		if(currentProject == null){
-			currentProject = project;
-			LinuxOpcontrolProvider.initializeOprofileModule();
-		} else {
-			String currentPath = LinuxtoolsPathProperty.getInstance().getLinuxtoolsPath(currentProject);
-			String newPath = LinuxtoolsPathProperty.getInstance().getLinuxtoolsPath(project);
-			
-			if(!currentPath.equals(newPath)){
-				try {
-					OprofileCorePlugin.getDefault().getOpcontrolProvider().deinitModule();
-					currentProject = project;
-					OprofileCorePlugin.getDefault().getOpcontrolProvider().initModule();
-				} catch (OpcontrolException e) {
-					OprofileCorePlugin.showErrorDialog("opcontrolProvider", e); //$NON-NLS-1$
-				} 
-				currentProject = project;
-			}
-		}		
-	}
-	
-	public static IProject getCurrentProject(){
-		return currentProject;
 	}
 }

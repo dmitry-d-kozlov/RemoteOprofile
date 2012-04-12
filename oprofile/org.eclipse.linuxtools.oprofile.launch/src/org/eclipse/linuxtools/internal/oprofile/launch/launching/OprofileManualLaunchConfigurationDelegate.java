@@ -23,9 +23,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
-import org.eclipse.linuxtools.internal.oprofile.core.Oprofile;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileCorePlugin;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonEvent;
+import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpcontrolProvider;
 import org.eclipse.linuxtools.internal.oprofile.launch.OprofileLaunchMessages;
 import org.eclipse.linuxtools.internal.oprofile.launch.configuration.LaunchOptions;
 import org.eclipse.linuxtools.internal.oprofile.ui.view.OprofileViewSaveDefaultSessionAction;
@@ -48,7 +48,7 @@ public class OprofileManualLaunchConfigurationDelegate extends AbstractOprofileL
 	protected boolean preExec(LaunchOptions options, OprofileDaemonEvent[] daemonEvents) {
 		// Set current project to allow using the oprofile path that
 		// was chosen for the project
-		Oprofile.setCurrentProject(getProject());
+		LinuxOpcontrolProvider.setCurrentProject(getProject());
 //		//set up the oprofile daemon
 //		try {
 //			//kill the daemon (it shouldn't be running already, but to be safe)

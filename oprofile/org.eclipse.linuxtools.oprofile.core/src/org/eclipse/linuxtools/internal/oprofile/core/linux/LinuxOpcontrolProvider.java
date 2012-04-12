@@ -52,6 +52,9 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	// Logging verbosity. Specified with setupDaemon.
 	//--verbosity=all generates WAY too much stuff in the log
 	private String verbosity = ""; //$NON-NLS-1$
+
+	// Project that will be profiled.
+	public static IProject currentProject;
 	static {
 		initializeOprofileModule();
 	}
@@ -211,7 +214,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	 * entered the password
 	 */
 	private boolean runOpcontrol(ArrayList<String> args) throws OpcontrolException {	
-		IProject project = Oprofile.getCurrentProject();
+		IProject project = LinuxOpcontrolProvider.getCurrentProject();
 		
 		
 		// If no linuxtools' toolchain is defined for this project, use the path for the
@@ -301,7 +304,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	}
 	
 	private static String findOpcontrol() throws OpcontrolException {
-		IProject project = Oprofile.getCurrentProject();		
+		IProject project = LinuxOpcontrolProvider.getCurrentProject();
 		URL url = FileLocator.find(Platform.getBundle(OprofileCorePlugin
 				.getId()), new Path(OprofileConstants.OPCONTROL_REL_PATH), null);
 
@@ -386,7 +389,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 		final StringBuilder errorOutput = new StringBuilder();
 		Thread errReaderThread = null;
 		try {
-			Process p = RuntimeProcessFactory.getFactory().exec(args.toArray(new String[]{}), Oprofile.getCurrentProject());
+			Process p = RuntimeProcessFactory.getFactory().exec(args.toArray(new String[]{}), LinuxOpcontrolProvider.getCurrentProject());
 
 			final BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			final BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -448,6 +451,33 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 		}
 
 		return is;
+	}
+
+	public static IProject getCurrentProject(){
+		return currentProject;
+	}
+
+	// Reloads oprofile modules by calling 'opcontrol --deinit' and 'opcontrol --init'
+	public static void setCurrentProject(IProject project){
+
+		if(currentProject == null){
+			currentProject = project;
+			initializeOprofileModule();
+		} else {
+			String currentPath = LinuxtoolsPathProperty.getInstance().getLinuxtoolsPath(currentProject);
+			String newPath = LinuxtoolsPathProperty.getInstance().getLinuxtoolsPath(project);
+
+			if(!currentPath.equals(newPath)){
+				try {
+					OprofileCorePlugin.getDefault().getOpcontrolProvider().deinitModule();
+					currentProject = project;
+					OprofileCorePlugin.getDefault().getOpcontrolProvider().initModule();
+				} catch (OpcontrolException e) {
+					OprofileCorePlugin.showErrorDialog("opcontrolProvider", e); //$NON-NLS-1$
+				}
+				currentProject = project;
+			}
+		}
 	}
 
 	// Initializes static data for oprofile.
