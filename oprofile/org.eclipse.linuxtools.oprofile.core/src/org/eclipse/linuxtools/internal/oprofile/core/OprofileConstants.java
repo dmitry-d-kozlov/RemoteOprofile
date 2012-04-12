@@ -53,7 +53,7 @@ public class OprofileConstants {
 	// Location of opcontrol security wrapper
 	public static final String OPCONTROL_REL_PATH = "natives/linux/scripts/" + OPCONTROL_EXECUTABLE; //$NON-NLS-1$
 	// Ugh. Need to know whether the module is loaded without running oprofile commands...
-	static final String[] OPROFILE_CPU_TYPE_FILES = {
+	public static final String[] OPROFILE_CPU_TYPE_FILES = {
 		"/dev/oprofile/cpu_type", //$NON-NLS-1$
 		"/proc/sys/dev/oprofile/cpu_type"  //$NON-NLS-1$
 	};

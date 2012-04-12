@@ -12,7 +12,6 @@
 
 package org.eclipse.linuxtools.internal.oprofile.core;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
@@ -20,6 +19,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpInfo;
+import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpcontrolProvider;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelImage;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.checkevent.CheckEventsProcessor;
@@ -32,72 +32,10 @@ import org.eclipse.linuxtools.tools.launch.core.properties.LinuxtoolsPathPropert
 public class Oprofile
 {
 	// Oprofile information
-	private static OpInfo info;
+	public static OpInfo info;
 	
 	// Project that will be profiled. 
 	public static IProject currentProject;
-	
-	// Make sure that oprofile is ready to go
-	static {
-		initializeOprofileModule();
-	}
-	
-	/**
-	 * Initialize the oprofile module
-	 * 
-	 * This function will check if the kernel module is
-	 * loaded. If it is not, it will attempt to load it
-	 * (which will cause the system to prompt the user for
-	 * root access).
-	 */
-	static private void initializeOprofileModule() {
-		// Check if kernel module is loaded, if not, try to load it
-		if (!isKernelModuleLoaded())
-			initializeOprofile();
-		
-		//it still may not have loaded, if not, critical error
-		if (!isKernelModuleLoaded()) {
-			OprofileCorePlugin.showErrorDialog("oprofileInit", null); //$NON-NLS-1$
-//			throw new ExceptionInInitializerError(OprofileProperties.getString("fatal.kernelModuleNotLoaded")); //$NON-NLS-1$
-		}  else {
-			initializeOprofileCore();
-		}
-	}
-	
-	// This requires more inside knowledge about Oprofile than one would like,
-	// but it is the only way of knowing whether the module is loaded (and we can
-	// succesfully call into the oprofile wrapper library without causing it to print out
-	// a lot of warnings).
-	private static boolean isKernelModuleLoaded() {
-		for (int i = 0; i < OprofileConstants.OPROFILE_CPU_TYPE_FILES.length; ++i) {
-			File f = new File(OprofileConstants.OPROFILE_CPU_TYPE_FILES[i]);
-			if (f.exists())
-				return true;
-		}
-		
-		return false;
-	}
-	
-	// initialize oprofile module by calling `opcontrol --init`
-	private static void initializeOprofile() {
-		try {
-			OprofileCorePlugin.getDefault().getOpcontrolProvider().initModule();
-		} catch (OpcontrolException e) {
-			OprofileCorePlugin.showErrorDialog("opcontrolProvider", e); //$NON-NLS-1$
-		} 
-	}
-
-
-	// Initializes static data for oprofile.
-	private static void initializeOprofileCore () {
-		if (isKernelModuleLoaded()){
-			info = OpInfo.getInfo();
-			
-			if (info == null) {
-				throw new ExceptionInInitializerError(OprofileProperties.getString("fatal.opinfoNotParsed")); //$NON-NLS-1$
-			}
-		}
-	}
 	
 	/**
 	 * Queries oprofile for the number of counters on the current CPU.
@@ -105,7 +43,7 @@ public class Oprofile
 	 * @return the number of counters
 	 */
 	public static int getNumberOfCounters() {
-		if (!isKernelModuleLoaded()){
+		if (!LinuxOpcontrolProvider.isKernelModuleLoaded()){
 			return 0;
 		}
 		return info.getNrCounters();
@@ -158,7 +96,7 @@ public class Oprofile
 	 * @return true if oprofile is in timer mode, false otherwise
 	 */
 	public static boolean getTimerMode() {
-		if (! isKernelModuleLoaded()){
+		if (! LinuxOpcontrolProvider.isKernelModuleLoaded()){
 			return true;
 		}
 		return info.getTimerMode();
@@ -235,9 +173,8 @@ public class Oprofile
 		
 		if(currentProject == null){
 			currentProject = project;
-			initializeOprofileModule();		
+			LinuxOpcontrolProvider.initializeOprofileModule();
 		} else {
-			
 			String currentPath = LinuxtoolsPathProperty.getInstance().getLinuxtoolsPath(currentProject);
 			String newPath = LinuxtoolsPathProperty.getInstance().getLinuxtoolsPath(project);
 			

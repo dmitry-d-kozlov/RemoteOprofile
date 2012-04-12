@@ -35,6 +35,7 @@ import org.eclipse.linuxtools.internal.oprofile.core.OprofileConstants;
 import org.eclipse.linuxtools.internal.oprofile.core.Oprofile;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileCorePlugin;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileProperties;
+import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpInfo;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonOptions;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.sessions.SessionManager;
@@ -51,6 +52,9 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	// Logging verbosity. Specified with setupDaemon.
 	//--verbosity=all generates WAY too much stuff in the log
 	private String verbosity = ""; //$NON-NLS-1$
+	static {
+		initializeOprofileModule();
+	}
 	
 	
 	public LinuxOpcontrolProvider() throws OpcontrolException {
@@ -445,5 +449,61 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 
 		return is;
 	}
+
+	// Initializes static data for oprofile.
+	public static void initializeOprofileCore () {
+		if (isKernelModuleLoaded()){
+			Oprofile.info = OpInfo.getInfo();
+
+			if (Oprofile.info == null) {
+				throw new ExceptionInInitializerError(OprofileProperties.getString("fatal.opinfoNotParsed")); //$NON-NLS-1$
+			}
+		}
+	}
+
+	// initialize oprofile module by calling `opcontrol --init`
+	public static void initializeOprofile() {
+		try {
+			OprofileCorePlugin.getDefault().getOpcontrolProvider().initModule();
+		} catch (OpcontrolException e) {
+			OprofileCorePlugin.showErrorDialog("opcontrolProvider", e); //$NON-NLS-1$
+		}
+	}
+
+	// This requires more inside knowledge about Oprofile than one would like,
+	// but it is the only way of knowing whether the module is loaded (and we can
+	// succesfully call into the oprofile wrapper library without causing it to print out
+	// a lot of warnings).
+	public static boolean isKernelModuleLoaded() {
+		for (int i = 0; i < OprofileConstants.OPROFILE_CPU_TYPE_FILES.length; ++i) {
+			File f = new File(OprofileConstants.OPROFILE_CPU_TYPE_FILES[i]);
+			if (f.exists())
+				return true;
+		}
+
+		return false;
+	}
+
+	/**
+		 * Initialize the oprofile module
+		 *
+		 * This function will check if the kernel module is
+		 * loaded. If it is not, it will attempt to load it
+		 * (which will cause the system to prompt the user for
+		 * root access).
+		 */
+		public static void initializeOprofileModule() {
+			// Check if kernel module is loaded, if not, try to load it
+			if (!LinuxOpcontrolProvider.isKernelModuleLoaded())
+				LinuxOpcontrolProvider.initializeOprofile();
+
+			//it still may not have loaded, if not, critical error
+			if (!LinuxOpcontrolProvider.isKernelModuleLoaded()) {
+				OprofileCorePlugin.showErrorDialog("oprofileInit", null); //$NON-NLS-1$
+	//			throw new ExceptionInInitializerError(OprofileProperties.getString("fatal.kernelModuleNotLoaded")); //$NON-NLS-1$
+			}  else {
+				LinuxOpcontrolProvider.initializeOprofileCore();
+			}
+		}
 
 }
