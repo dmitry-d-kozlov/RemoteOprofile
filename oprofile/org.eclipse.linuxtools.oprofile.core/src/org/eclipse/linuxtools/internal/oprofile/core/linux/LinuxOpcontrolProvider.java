@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.internal.oprofile.core.IOpcontrolProvider;
 import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
+import org.eclipse.linuxtools.internal.oprofile.core.OprofileConstants;
 import org.eclipse.linuxtools.internal.oprofile.core.Oprofile;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileCorePlugin;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileProperties;
@@ -52,46 +53,6 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	
 	private final String opcontrolProgram;
 
-	// Initialize the Oprofile kernel module and oprofilefs
-	private static final String OPD_INIT_MODULE = "--init"; //$NON-NLS-1$
-	
-	// Setup daemon collection arguments
-	private static final String OPD_SETUP = "--setup"; //$NON-NLS-1$
-	private static final String OPD_HELP = "--help"; //$NON-NLS-1$
-	private static final String OPD_SETUP_SEPARATE = "--separate="; //$NON-NLS-1$
-	private static final String OPD_SETUP_SEPARATE_SEPARATOR = ","; //$NON-NLS-1$
-	private static final String OPD_SETUP_SEPARATE_NONE = "none"; //$NON-NLS-1$
-	private static final String OPD_SETUP_SEPARATE_LIBRARY = "library"; //$NON-NLS-1$
-	private static final String OPD_SETUP_SEPARATE_KERNEL = "kernel"; //$NON-NLS-1$
-	private static final String OPD_SETUP_SEPARATE_THREAD = "thread"; //$NON-NLS-1$
-	private static final String OPD_SETUP_SEPARATE_CPU = "cpu"; //$NON-NLS-1$
-
-	private static final String OPD_SETUP_EVENT = "--event="; //$NON-NLS-1$
-	private static final String OPD_SETUP_EVENT_SEPARATOR = ":"; //$NON-NLS-1$
-	private static final String OPD_SETUP_EVENT_TRUE = "1"; //$NON-NLS-1$
-	private static final String OPD_SETUP_EVENT_FALSE = "0"; //$NON-NLS-1$
-	private static final String OPD_SETUP_EVENT_DEFAULT = "default"; //$NON-NLS-1$
-
-	private static final String OPD_SETUP_IMAGE = "--image="; //$NON-NLS-1$
-
-	private static final String OPD_CALLGRAPH_DEPTH = "--callgraph="; //$NON-NLS-1$
-
-	// Kernel image file options
-	private static final String OPD_KERNEL_NONE = "--no-vmlinux"; //$NON-NLS-1$
-	private static final String OPD_KERNEL_FILE = "--vmlinux="; //$NON-NLS-1$
-	
-	// Start the daemon process without starting data collection
-	private static final String OPD_START_DAEMON = "--start-daemon"; //$NON-NLS-1$
-	
-	// Start collecting profiling data
-	private static final String OPD_START_COLLECTION = "--start"; //$NON-NLS-1$
-	
-	// Flush the collected profiling data to disk
-	private static final String OPD_DUMP = "--dump"; //$NON-NLS-1$
-	
-	// Stop data collection
-	private static final String OPD_STOP_COLLECTION = "--stop"; //$NON-NLS-1$
-	
 	// Stop data collection and stop daemon
 	private static final String OPD_SHUTDOWN = "--shutdown"; //$NON-NLS-1$
 	
@@ -123,7 +84,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	 * @throws OpcontrolException
 	 */
 	public void dumpSamples() throws OpcontrolException {
-		runOpcontrol(OPD_DUMP);
+		runOpcontrol(OprofileConstants.OPD_DUMP);
 	}
 	
 	/**
@@ -131,7 +92,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	 * @throws OpcontrolException
 	 */
 	public void initModule() throws OpcontrolException {
-		runOpcontrol(OPD_INIT_MODULE);
+		runOpcontrol(OprofileConstants.OPD_INIT_MODULE);
 	}
 	
 	/**
@@ -191,11 +152,11 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	public void setupDaemon(OprofileDaemonOptions options, OprofileDaemonEvent[] events) throws OpcontrolException {
 		// Convert options & events to arguments for opcontrol
 		ArrayList<String> args = new ArrayList<String>();
-		args.add(OPD_SETUP);
+		args.add(OprofileConstants.OPD_SETUP);
 		optionsToArguments(args, options);
 		if (!Oprofile.getTimerMode()) {
 			if (events == null || events.length == 0) {
-				args.add(OPD_SETUP_EVENT + OPD_SETUP_EVENT_DEFAULT);
+				args.add(OprofileConstants.OPD_SETUP_EVENT + OprofileConstants.OPD_SETUP_EVENT_DEFAULT);
 			} else {
 				for (int i = 0; i < events.length; ++i) {
 					eventToArguments(args, events[i]);
@@ -218,7 +179,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	 * @throws OpcontrolException
 	 */
 	public void startCollection() throws OpcontrolException {
-		runOpcontrol(OPD_START_COLLECTION);
+		runOpcontrol(OprofileConstants.OPD_START_COLLECTION);
 	}
 	
 	/**
@@ -226,7 +187,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	 * @throws OpcontrolException
 	 */
 	public void startDaemon() throws OpcontrolException {
-		runOpcontrol(OPD_START_DAEMON);
+		runOpcontrol(OprofileConstants.OPD_START_DAEMON);
 	}
 	
 	/**
@@ -234,7 +195,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	 * @throws OpcontrolException
 	 */
 	public void stopCollection() throws OpcontrolException {
-		runOpcontrol(OPD_STOP_COLLECTION);
+		runOpcontrol(OprofileConstants.OPD_STOP_COLLECTION);
 	}
 
 	/**
@@ -242,7 +203,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	 * @throws OpcontrolException
 	 */
 	public boolean status() throws OpcontrolException {
-		return runOpcontrol(OPD_HELP);
+		return runOpcontrol(OprofileConstants.OPD_HELP);
 	}
 	
 	// Convenience function
@@ -273,7 +234,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 
 		// Verbosity hack. If --start or --start-daemon, add verbosity, if set
 		String cmd = (String) args.get(1);
-		if (verbosity.length() > 0 && (cmd.equals (OPD_START_COLLECTION) || cmd.equals(OPD_START_DAEMON))) {
+		if (verbosity.length() > 0 && (cmd.equals (OprofileConstants.OPD_START_COLLECTION) || cmd.equals(OprofileConstants.OPD_START_DAEMON))) {
 			args.add(verbosity);
 		}
 		
@@ -372,16 +333,16 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	// Convert the event into arguments for opcontrol
 	private void eventToArguments(ArrayList<String> args, OprofileDaemonEvent event) {
 		// Event spec: "EVENT:count:mask:profileKernel:profileUser"
-		String spec = new String(OPD_SETUP_EVENT);
+		String spec = new String(OprofileConstants.OPD_SETUP_EVENT);
 		spec += event.getEvent().getText();
-		spec += OPD_SETUP_EVENT_SEPARATOR;
+		spec += OprofileConstants.OPD_SETUP_EVENT_SEPARATOR;
 		spec += event.getResetCount();
-		spec += OPD_SETUP_EVENT_SEPARATOR;
+		spec += OprofileConstants.OPD_SETUP_EVENT_SEPARATOR;
 		spec += event.getEvent().getUnitMask().getMaskValue();
-		spec += OPD_SETUP_EVENT_SEPARATOR;
-		spec += (event.getProfileKernel() ? OPD_SETUP_EVENT_TRUE : OPD_SETUP_EVENT_FALSE);
-		spec += OPD_SETUP_EVENT_SEPARATOR;
-		spec += (event.getProfileUser() ? OPD_SETUP_EVENT_TRUE : OPD_SETUP_EVENT_FALSE);
+		spec += OprofileConstants.OPD_SETUP_EVENT_SEPARATOR;
+		spec += (event.getProfileKernel() ? OprofileConstants.OPD_SETUP_EVENT_TRUE : OprofileConstants.OPD_SETUP_EVENT_FALSE);
+		spec += OprofileConstants.OPD_SETUP_EVENT_SEPARATOR;
+		spec += (event.getProfileUser() ? OprofileConstants.OPD_SETUP_EVENT_TRUE : OprofileConstants.OPD_SETUP_EVENT_FALSE);
 		args.add(spec);
 	}
 	
@@ -390,35 +351,35 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 		// Add separate flags
 		int mask = options.getSeparateProfilesMask();
 
-		String separate = new String(OPD_SETUP_SEPARATE);
+		String separate = new String(OprofileConstants.OPD_SETUP_SEPARATE);
 		
 		if (mask == OprofileDaemonOptions.SEPARATE_NONE) {
-			separate += OPD_SETUP_SEPARATE_NONE;
+			separate += OprofileConstants.OPD_SETUP_SEPARATE_NONE;
 		} else {
 			//note that opcontrol will nicely ignore the trailing comma
 			if ((mask & OprofileDaemonOptions.SEPARATE_LIBRARY) != 0)
-				separate += OPD_SETUP_SEPARATE_LIBRARY + OPD_SETUP_SEPARATE_SEPARATOR;
+				separate += OprofileConstants.OPD_SETUP_SEPARATE_LIBRARY + OprofileConstants.OPD_SETUP_SEPARATE_SEPARATOR;
 			if ((mask & OprofileDaemonOptions.SEPARATE_KERNEL) != 0)
-				separate += OPD_SETUP_SEPARATE_KERNEL + OPD_SETUP_SEPARATE_SEPARATOR;
+				separate += OprofileConstants.OPD_SETUP_SEPARATE_KERNEL + OprofileConstants.OPD_SETUP_SEPARATE_SEPARATOR;
 			if ((mask & OprofileDaemonOptions.SEPARATE_THREAD) != 0)
-				separate += OPD_SETUP_SEPARATE_THREAD + OPD_SETUP_SEPARATE_SEPARATOR;
+				separate += OprofileConstants.OPD_SETUP_SEPARATE_THREAD + OprofileConstants.OPD_SETUP_SEPARATE_SEPARATOR;
 			if ((mask & OprofileDaemonOptions.SEPARATE_CPU) != 0)
-				separate += OPD_SETUP_SEPARATE_CPU + OPD_SETUP_SEPARATE_SEPARATOR;
+				separate += OprofileConstants.OPD_SETUP_SEPARATE_CPU + OprofileConstants.OPD_SETUP_SEPARATE_SEPARATOR;
 		}
 		args.add(separate);
 		
 		// Add kernel image
 		if (options.getKernelImageFile() == null || options.getKernelImageFile().length() == 0) {
-			args.add(OPD_KERNEL_NONE);
+			args.add(OprofileConstants.OPD_KERNEL_NONE);
 		} else {
-			args.add(OPD_KERNEL_FILE + options.getKernelImageFile());
+			args.add(OprofileConstants.OPD_KERNEL_FILE + options.getKernelImageFile());
 		}
 
 		//image filter -- always non-null
-		args.add(OPD_SETUP_IMAGE + options.getBinaryImage());
+		args.add(OprofileConstants.OPD_SETUP_IMAGE + options.getBinaryImage());
 		
 		//callgraph depth
-		args.add(OPD_CALLGRAPH_DEPTH + options.getCallgraphDepth());
+		args.add(OprofileConstants.OPD_CALLGRAPH_DEPTH + options.getCallgraphDepth());
 	}
 
 	/**
