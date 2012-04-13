@@ -11,7 +11,7 @@
 
 package org.eclipse.linuxtools.internal.oprofile.core.model;
 
-import org.eclipse.linuxtools.internal.oprofile.core.Oprofile;
+import org.eclipse.linuxtools.internal.oprofile.core.OprofileInfoProvider;
 
 
 /**
@@ -62,7 +62,7 @@ public class OpModelSession {
 	}
 	
 	protected OpModelImage getNewImage() {
-		return Oprofile.getModelData(parentEvent.getName(), name);
+		return OprofileInfoProvider.getModelData(parentEvent.getName(), name);
 	}
 
 	public String toString(String tabs) {

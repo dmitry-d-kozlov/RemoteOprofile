@@ -11,7 +11,7 @@
 
 package org.eclipse.linuxtools.internal.oprofile.core.model;
 
-import org.eclipse.linuxtools.internal.oprofile.core.Oprofile;
+import org.eclipse.linuxtools.internal.oprofile.core.OprofileInfoProvider;
 
 /**
  * A root node for the data model. Only one instance exists at any time,
@@ -52,7 +52,7 @@ public class OpModelRoot {
 	
 	protected OpModelEvent[] getNewEvents() {
 		//launch `opxml sessions`, gather up events & the sessions under them
-		return Oprofile.getEvents(); 
+		return OprofileInfoProvider.getEvents();
 	}
 	
 	public OpModelEvent[] getEvents() {

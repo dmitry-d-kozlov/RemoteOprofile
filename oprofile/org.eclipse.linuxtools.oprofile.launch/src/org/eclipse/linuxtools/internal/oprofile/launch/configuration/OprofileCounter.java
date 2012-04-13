@@ -17,7 +17,7 @@ import java.text.MessageFormat;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.linuxtools.internal.oprofile.core.Oprofile;
+import org.eclipse.linuxtools.internal.oprofile.core.OprofileInfoProvider;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpUnitMask;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonEvent;
@@ -51,7 +51,7 @@ public class OprofileCounter {
 	public OprofileCounter(int nr) {
 		number = nr;
 		_enabled = false;
-		eventList = Oprofile.getEvents(number);
+		eventList = OprofileInfoProvider.getEvents(number);
 		daemonEvent = new OprofileDaemonEvent();
 	}
 
@@ -61,7 +61,7 @@ public class OprofileCounter {
 	 * @return an array of all counters
 	 */
 	public static OprofileCounter[] getCounters(ILaunchConfiguration config) {
-		OprofileCounter[] ctrs = new OprofileCounter[Oprofile.getNumberOfCounters()];
+		OprofileCounter[] ctrs = new OprofileCounter[OprofileInfoProvider.getNumberOfCounters()];
 		for (int i = 0; i < ctrs.length; i++)
 		{
 			ctrs[i] = new OprofileCounter(i);

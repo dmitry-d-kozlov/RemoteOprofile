@@ -13,7 +13,7 @@ package org.eclipse.linuxtools.internal.oprofile.launch.configuration;
 
 import java.util.HashMap;
 
-import org.eclipse.linuxtools.internal.oprofile.core.Oprofile;
+import org.eclipse.linuxtools.internal.oprofile.core.OprofileInfoProvider;
 
 /**
  * Cache class for event configuration. Currently only used to cache the results
@@ -80,7 +80,7 @@ public class EventConfigCache {
 		
 		if (result == null) {
 			//not in the map, get its value and add it in
-			result = Oprofile.checkEvent(counter, event, mask);
+			result = OprofileInfoProvider.checkEvent(counter, event, mask);
 			
 			//possible to be null if there is no opxmlProvider
 			if (result != null) {

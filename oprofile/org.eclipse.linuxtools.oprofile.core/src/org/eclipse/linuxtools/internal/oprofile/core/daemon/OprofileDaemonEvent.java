@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.internal.oprofile.core.daemon;
 
-import org.eclipse.linuxtools.internal.oprofile.core.Oprofile;
+import org.eclipse.linuxtools.internal.oprofile.core.OprofileInfoProvider;
 
 /**
  * This class represents an event used to configure the OProfile
@@ -105,7 +105,7 @@ public class OprofileDaemonEvent {
 		// FIXME: This isn't quite in the right place...
 		if (count == COUNT_UNINITIALIZED) {
 			// This is what Oprofile does in oprof_start.cpp:
-			double speed = Oprofile.getCpuFrequency();
+			double speed = OprofileInfoProvider.getCpuFrequency();
 			if (speed == 0.0) {
 				count = event.getMinCount() * 30;
 			} else {

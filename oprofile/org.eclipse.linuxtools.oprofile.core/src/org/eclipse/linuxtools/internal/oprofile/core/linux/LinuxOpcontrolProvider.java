@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.internal.oprofile.core.IOpcontrolProvider;
 import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileConstants;
-import org.eclipse.linuxtools.internal.oprofile.core.Oprofile;
+import org.eclipse.linuxtools.internal.oprofile.core.OprofileInfoProvider;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileCorePlugin;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileProperties;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonEvent;
@@ -146,7 +146,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 		ArrayList<String> args = new ArrayList<String>();
 		args.add(OprofileConstants.OPD_SETUP);
 		optionsToArguments(args, options);
-		if (!Oprofile.getTimerMode()) {
+		if (!OprofileInfoProvider.getTimerMode()) {
 			if (events == null || events.length == 0) {
 				args.add(OprofileConstants.OPD_SETUP_EVENT + OprofileConstants.OPD_SETUP_EVENT_DEFAULT);
 			} else {
@@ -482,9 +482,9 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	// Initializes static data for oprofile.
 	public static void initializeOprofileCore () {
 		if (isKernelModuleLoaded()){
-			Oprofile.info = Oprofile.getInfo();
+			OprofileInfoProvider.info = OprofileInfoProvider.getInfo();
 
-			if (Oprofile.info == null) {
+			if (OprofileInfoProvider.info == null) {
 				throw new ExceptionInInitializerError(OprofileProperties.getString("fatal.opinfoNotParsed")); //$NON-NLS-1$
 			}
 		}

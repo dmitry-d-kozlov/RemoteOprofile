@@ -7,8 +7,9 @@
  *
  * Contributors:
  *    Keith Seitz <keiths@redhat.com> - initial API and implementation
- *    Kent Sebastian <ksebasti@redhat.com> - 
- *******************************************************************************/ 
+ *    Kent Sebastian <ksebasti@redhat.com> -
+ *    Dmitry Kozlov <ddk@codesourcery.com> - refactoring
+ *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.oprofile.core;
 
@@ -26,13 +27,13 @@ import org.eclipse.linuxtools.internal.oprofile.core.opxml.checkevent.CheckEvent
 
 
 /**
- * Common class wrapper for all things Oprofile.
+ * Common implementation for IOprofileInfoProvider which uses IOprofileDataProvider
+ * as underlying layer which performs queries to OProfile.
  */
-public class Oprofile
-{
+public class OprofileInfoProvider {
 	// Oprofile information
 	public static OpInfo info;
-	
+
 	/**
 	 * Queries oprofile for the number of counters on the current CPU.
 	 * Used only in launch config tabs.
@@ -44,7 +45,7 @@ public class Oprofile
 		}
 		return info.getNrCounters();
 	}
-	
+
 	/**
 	 * Returns the CPU speed of the current configuration.
 	 * @return the cpu speed in MHz
@@ -70,7 +71,7 @@ public class Oprofile
 	public static OpEvent[] getEvents(int num) {
 		return info.getEvents(num);
 	}
-	
+
 	/**
 	 * Returns the default location of the oprofile samples directory.
 	 * @return the default samples directory
@@ -78,7 +79,7 @@ public class Oprofile
 	public static String getDefaultSamplesDirectory() {
 		return info.getDefault(OpInfo.DEFAULT_SAMPLE_DIR);
 	}
-	
+
 	/**
 	 * Returns the oprofile daemon log file.
 	 * @return the log file (absolute pathname)
@@ -86,7 +87,7 @@ public class Oprofile
 	public static String getLogFile() {
 		return info.getDefault(OpInfo.DEFAULT_LOG_FILE);
 	}
-	
+
 	/**
 	 * Returns whether or not oprofile is in timer mode.
 	 * @return true if oprofile is in timer mode, false otherwise
@@ -97,7 +98,7 @@ public class Oprofile
 		}
 		return info.getTimerMode();
 	}
-	
+
 	/**
 	 * Checks the requested counter, event, and unit mask for vailidity.
 	 * @param ctr	the counter
@@ -116,10 +117,10 @@ public class Oprofile
 			OprofileCorePlugin.showErrorDialog("opxmlProvider", e); //$NON-NLS-1$
 			return null;
 		}
-		
+
 		return (validResult[0] == CheckEventsProcessor.EVENT_OK);
 	}
-	
+
 	/**
 	 * Returns a list of all the events collected on the system, as well as
 	 * the sessions under each of them.
@@ -127,7 +128,7 @@ public class Oprofile
 	 */
 	public static OpModelEvent[] getEvents() {
 		OpModelEvent[] events = null;
-		
+
 		ArrayList<OpModelEvent> sessionList = new ArrayList<OpModelEvent>();
 		try {
 			IRunnableWithProgress opxml = OprofileCorePlugin.getDefault().getOprofileDataProvider().sessions(sessionList);
@@ -147,15 +148,15 @@ public class Oprofile
 	 * @param session the session for which to get samples
 	 * @param shell the composite shell to use for the progress dialog
 	 */
-	public static OpModelImage getModelData(String eventName, String sessionName) {		
+	public static OpModelImage getModelData(String eventName, String sessionName) {
 		OpModelImage image = new OpModelImage();
-		
+
 		final IRunnableWithProgress opxml;
 		try {
 			opxml = OprofileCorePlugin.getDefault().getOprofileDataProvider().modelData(eventName, sessionName, image);
 			opxml.run(null);
-		} catch (InvocationTargetException e) { 
-		} catch (InterruptedException e) { 
+		} catch (InvocationTargetException e) {
+		} catch (InterruptedException e) {
 		} catch (OprofileDataException e) {
 			OprofileCorePlugin.showErrorDialog("opxmlProvider", e); //$NON-NLS-1$
 			return null;

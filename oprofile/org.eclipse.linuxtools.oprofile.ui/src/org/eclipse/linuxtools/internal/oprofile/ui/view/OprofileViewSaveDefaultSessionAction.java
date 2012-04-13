@@ -20,7 +20,7 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
-import org.eclipse.linuxtools.internal.oprofile.core.Oprofile;
+import org.eclipse.linuxtools.internal.oprofile.core.OprofileInfoProvider;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileCorePlugin;
 import org.eclipse.linuxtools.internal.oprofile.ui.OprofileUiMessages;
 import org.eclipse.linuxtools.internal.oprofile.ui.OprofileUiPlugin;
@@ -113,7 +113,7 @@ public class OprofileViewSaveDefaultSessionAction extends Action {
 			}
 			
 			// Must not already exist (opcontrol doesn't allow it)
-			File file = new File(Oprofile.getDefaultSamplesDirectory(), newText);
+			File file = new File(OprofileInfoProvider.getDefaultSamplesDirectory(), newText);
 			if (file.exists()) {
 				String format = OprofileUiMessages.getString("savedialog.validator.exists"); //$NON-NLS-1$
 				Object[] fmtArgs = new Object[] { newText };
