@@ -475,6 +475,12 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 		return runCommand(args);
 	}
 
+	public InputStream runAddr2Line(ArrayList<String> args)	throws OpcontrolException {
+		args.add(0, "addr2line"); //$NON-NLS-1$
+		args.add(1, "-e");       //$NON-NLS-1$
+		return runCommand(args);
+	}
+
 	protected InputStream runCommand(ArrayList<String> args) throws OpcontrolException {
 		final StringBuilder output = new StringBuilder();
 		final StringBuilder errorOutput = new StringBuilder();

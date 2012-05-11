@@ -111,4 +111,12 @@ public interface IOpcontrolProvider {
 	 */
 	public InputStream runOpHelp(ArrayList<String> args) throws OpcontrolException;
 
+	/**
+     * Run addr2line command
+     * @param args addr2Line arguments except -e flag, which is added
+     * @return
+	 * @throws OpcontrolException
+	 */
+	public InputStream runAddr2Line(ArrayList<String> args) throws OpcontrolException;
+
 }
