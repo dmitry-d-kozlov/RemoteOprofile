@@ -102,4 +102,13 @@ public interface IOpcontrolProvider {
 	 * @throws OpcontrolException
 	 */
 	public InputStream runOpReport(ArrayList<String> args) throws OpcontrolException;
+
+	/**
+     * Run ophelp command
+     * @param args ophelp arguments except -X flag, which is added
+     * @return
+	 * @throws OpcontrolException
+	 */
+	public InputStream runOpHelp(ArrayList<String> args) throws OpcontrolException;
+
 }

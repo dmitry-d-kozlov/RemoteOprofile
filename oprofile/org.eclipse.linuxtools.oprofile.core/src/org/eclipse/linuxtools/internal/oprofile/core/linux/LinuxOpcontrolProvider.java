@@ -383,73 +383,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	public InputStream runOpReport(ArrayList<String> args) throws OpcontrolException {
 		args.add(0, "opreport"); //$NON-NLS-1$
 		args.add(1, "-X");       //$NON-NLS-1$
-
-		final StringBuilder output = new StringBuilder();
-		final StringBuilder errorOutput = new StringBuilder();
-		Thread errReaderThread = null;
-		try {
-			Process p = RuntimeProcessFactory.getFactory().exec(args.toArray(new String[]{}), LinuxOpcontrolProvider.getCurrentProject());
-
-			final BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			final BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			try {
-				// Read output of opreport. We need to do this, since this might
-				// cause the plug-in to hang. See Eclipse bug 341621 for more info.
-				errReaderThread = new Thread(new Runnable() {
-					      public void run(){
-								String line = null;
-								try {
-									while (((line = stdError.readLine()) != null)) {
-										errorOutput.append(line + System.getProperty("line.separator")); //$NON-NLS-1$
-									}
-								} catch (IOException e) {
-								}
-					      }
-					    });
-				errReaderThread.start();
-
-				String s = null;
-				while ((s = stdInput.readLine()) != null) {
-					output.append(s + System.getProperty("line.separator")); //$NON-NLS-1$
-				}
-
-			} finally {
-				stdInput.close();
-				stdError.close();
-
-				if(errReaderThread != null) {
-					try {
-						errReaderThread.join();
-					} catch (InterruptedException e) {
-					}
-				}
-			}
-			int exitCode = p.waitFor();
-			if (exitCode != 0){
-				throw new OpcontrolException(new Status(IStatus.ERROR, OprofileCorePlugin.getId(),
-					NLS.bind(OprofileProperties.getString("opreport.error.nonZeroExitCode"),exitCode), null));  //$NON-NLS-1$ 
-			}
-		} catch (IOException e) {
-			throw new OpcontrolException(new Status(IStatus.ERROR, OprofileCorePlugin.getId(),
-				OprofileProperties.getString("opreport.error.ioException"), e));         //$NON-NLS-1$
-		} catch (InterruptedException e) {
-		}
-
-		if (!errorOutput.toString().trim().equals("")) { //$NON-NLS-1$
-			throw new OpcontrolException(new Status(IStatus.ERROR, OprofileCorePlugin.getId(),
-				NLS.bind(OprofileProperties.getString("opreport.error.nonEmptyStderr"), errorOutput.toString().trim()))); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		// convert the string to inputstream to pass 
-		InputStream is = null;
-		try {
-			is = new ByteArrayInputStream(output.toString().getBytes("UTF-8")); //$NON-NLS-1$
-		} catch (UnsupportedEncodingException e) {
-			throw new OpcontrolException(new Status(IStatus.ERROR, OprofileCorePlugin.getId(),
-				OprofileProperties.getString("opreport.error.cantConvertEncoding"), e)); //$NON-NLS-1$
-		}
-
-		return is;
+		return runCommand(args);
 	}
 
 	public static IProject getCurrentProject(){
@@ -534,5 +468,79 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 				LinuxOpcontrolProvider.initializeOprofileCore();
 			}
 		}
+
+	public InputStream runOpHelp(ArrayList<String> args) throws OpcontrolException {
+		args.add(0, "ophelp"); //$NON-NLS-1$
+		args.add(1, "-X");       //$NON-NLS-1$
+		return runCommand(args);
+	}
+
+	protected InputStream runCommand(ArrayList<String> args) throws OpcontrolException {
+		final StringBuilder output = new StringBuilder();
+		final StringBuilder errorOutput = new StringBuilder();
+		Thread errReaderThread = null;
+		try {
+			Process p = RuntimeProcessFactory.getFactory().exec(args.toArray(new String[]{}), LinuxOpcontrolProvider.getCurrentProject());
+
+			final BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			final BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			try {
+				// Read output of command
+				errReaderThread = new Thread(new Runnable() {
+					      public void run(){
+								String line = null;
+								try {
+									while (((line = stdError.readLine()) != null)) {
+										errorOutput.append(line + System.getProperty("line.separator")); //$NON-NLS-1$
+									}
+								} catch (IOException e) {
+								}
+					      }
+					    });
+				errReaderThread.start();
+
+				String s = null;
+				while ((s = stdInput.readLine()) != null) {
+					output.append(s + System.getProperty("line.separator")); //$NON-NLS-1$
+				}
+
+			} finally {
+				stdInput.close();
+				stdError.close();
+
+				if(errReaderThread != null) {
+					try {
+						errReaderThread.join();
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+			int exitCode = p.waitFor();
+			if (exitCode != 0){
+				throw new OpcontrolException(new Status(IStatus.ERROR, OprofileCorePlugin.getId(),
+					NLS.bind(OprofileProperties.getString("command.error.nonZeroExitCode"),args.get(0),exitCode), null));  //$NON-NLS-1$ 
+			}
+		} catch (IOException e) {
+			throw new OpcontrolException(new Status(IStatus.ERROR, OprofileCorePlugin.getId(),
+					NLS.bind(OprofileProperties.getString("command.error.ioException"),args.get(0)), e));  //$NON-NLS-1$
+		} catch (InterruptedException e) {
+		}
+
+		if (!errorOutput.toString().trim().equals("")) { //$NON-NLS-1$
+			throw new OpcontrolException(new Status(IStatus.ERROR, OprofileCorePlugin.getId(),
+				NLS.bind(OprofileProperties.getString("command.error.nonEmptyStderr"), args.get(0), errorOutput.toString().trim()))); //$NON-NLS-1$
+		}
+
+		// convert the string to inputstream to pass
+		InputStream is = null;
+		try {
+			is = new ByteArrayInputStream(output.toString().getBytes("UTF-8")); //$NON-NLS-1$
+		} catch (UnsupportedEncodingException e) {
+			throw new OpcontrolException(new Status(IStatus.ERROR, OprofileCorePlugin.getId(),
+					NLS.bind(OprofileProperties.getString("command.error.cantConvertEncoding"), args.get(0)), e)); //$NON-NLS-1$
+		}
+
+		return is;
+	}
 
 }
