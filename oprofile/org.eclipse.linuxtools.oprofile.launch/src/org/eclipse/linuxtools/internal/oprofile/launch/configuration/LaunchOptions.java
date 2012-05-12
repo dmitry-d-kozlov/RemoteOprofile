@@ -17,8 +17,8 @@ import java.io.File;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonOptions;
 import org.eclipse.linuxtools.internal.oprofile.launch.OprofileLaunchPlugin;
+import org.eclipse.linuxtools.oprofile.core.daemon.OprofileDaemonOptions;
 
 /**
  * This class wraps OProfile's global launch options for the

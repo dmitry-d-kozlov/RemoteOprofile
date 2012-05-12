@@ -10,7 +10,7 @@
  *    Kent Sebastian <ksebasti@redhat.com> 
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.oprofile.core.daemon;
+package org.eclipse.linuxtools.oprofile.core.daemon;
 
 /**
  * A class representing the unit mask that may be associated with oprofile

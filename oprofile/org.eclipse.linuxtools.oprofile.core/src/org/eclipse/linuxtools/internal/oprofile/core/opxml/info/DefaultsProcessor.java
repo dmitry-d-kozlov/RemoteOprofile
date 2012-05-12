@@ -12,9 +12,9 @@ package org.eclipse.linuxtools.internal.oprofile.core.opxml.info;
 
 import java.util.HashMap;
 
-import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpInfo;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.OprofileSAXHandler;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.XMLProcessor;
+import org.eclipse.linuxtools.oprofile.core.daemon.OpInfo;
 
 /**
  * XML handler class for opxml's "defaults".

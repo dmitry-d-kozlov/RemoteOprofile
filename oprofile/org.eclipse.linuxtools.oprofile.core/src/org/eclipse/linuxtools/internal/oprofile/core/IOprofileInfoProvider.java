@@ -11,9 +11,9 @@
 
 package org.eclipse.linuxtools.internal.oprofile.core;
 
-import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelImage;
+import org.eclipse.linuxtools.oprofile.core.daemon.OpEvent;
 
 /**
  * Interface to query general information about oprofile.  

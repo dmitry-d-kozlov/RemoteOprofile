@@ -10,7 +10,7 @@
  *    Kent Sebastian <ksebasti@redhat.com>
  *******************************************************************************/ 
 
-package org.eclipse.linuxtools.internal.oprofile.core.daemon;
+package org.eclipse.linuxtools.oprofile.core.daemon;
 
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileInfoProvider;
 

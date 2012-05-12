@@ -14,8 +14,8 @@ package org.eclipse.linuxtools.internal.oprofile.core;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonEvent;
-import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonOptions;
+import org.eclipse.linuxtools.oprofile.core.daemon.OprofileDaemonEvent;
+import org.eclipse.linuxtools.oprofile.core.daemon.OprofileDaemonOptions;
 
 /**
  * Interface for oprofile core to utilize opcontrol program. Platform plugins should define/register

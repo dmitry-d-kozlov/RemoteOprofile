@@ -13,10 +13,10 @@ package org.eclipse.linuxtools.internal.oprofile.core.opxml.info;
 
 import java.util.ArrayList;
 
-import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpEvent;
-import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpUnitMask;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.OprofileSAXHandler;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.XMLProcessor;
+import org.eclipse.linuxtools.oprofile.core.daemon.OpEvent;
+import org.eclipse.linuxtools.oprofile.core.daemon.OpUnitMask;
 import org.xml.sax.Attributes;
 
 

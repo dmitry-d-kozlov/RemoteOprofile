@@ -18,11 +18,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileInfoProvider;
-import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpEvent;
-import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpUnitMask;
-import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonEvent;
 import org.eclipse.linuxtools.internal.oprofile.launch.OprofileLaunchMessages;
 import org.eclipse.linuxtools.internal.oprofile.launch.OprofileLaunchPlugin;
+import org.eclipse.linuxtools.oprofile.core.daemon.OpEvent;
+import org.eclipse.linuxtools.oprofile.core.daemon.OpUnitMask;
+import org.eclipse.linuxtools.oprofile.core.daemon.OprofileDaemonEvent;
 
 /**
  * This class represents an oprofile runtime configuration of a counter. It is

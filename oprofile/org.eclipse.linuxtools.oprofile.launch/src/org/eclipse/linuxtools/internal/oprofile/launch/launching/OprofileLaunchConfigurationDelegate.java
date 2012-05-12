@@ -17,9 +17,9 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.ILaunchesListener2;
 import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileCorePlugin;
-import org.eclipse.linuxtools.internal.oprofile.core.daemon.OprofileDaemonEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpcontrolProvider;
 import org.eclipse.linuxtools.internal.oprofile.launch.configuration.LaunchOptions;
+import org.eclipse.linuxtools.oprofile.core.daemon.OprofileDaemonEvent;
 import org.eclipse.swt.widgets.Display;
 
 public class OprofileLaunchConfigurationDelegate extends AbstractOprofileLaunchConfigurationDelegate {

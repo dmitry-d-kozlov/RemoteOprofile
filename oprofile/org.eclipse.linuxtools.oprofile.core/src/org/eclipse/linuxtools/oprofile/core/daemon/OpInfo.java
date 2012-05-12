@@ -11,7 +11,7 @@
  *    Dmitry Kozlov <ddk@codesourcery.com> - code refactoring
  *******************************************************************************/ 
 
-package org.eclipse.linuxtools.internal.oprofile.core.daemon;
+package org.eclipse.linuxtools.oprofile.core.daemon;
 
 import java.util.Arrays;
 import java.util.Comparator;

@@ -16,14 +16,14 @@ package org.eclipse.linuxtools.internal.oprofile.core;
 import java.util.ArrayList;
 
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpEvent;
-import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpInfo;
 import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpcontrolProvider;
 import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpxmlProvider;
 import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpxmlProvider.OpInfoRunner;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelImage;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.checkevent.CheckEventsProcessor;
+import org.eclipse.linuxtools.oprofile.core.daemon.OpEvent;
+import org.eclipse.linuxtools.oprofile.core.daemon.OpInfo;
 
 
 /**
