@@ -13,13 +13,13 @@
 
 package org.eclipse.linuxtools.internal.oprofile.core;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpInfo;
 import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpcontrolProvider;
+import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpxmlProvider;
 import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpxmlProvider.OpInfoRunner;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelImage;
@@ -109,11 +109,10 @@ public class OprofileInfoProvider {
 	public static Boolean checkEvent(int ctr, String event, int um) {
 		int[] validResult = new int[1];
 		try {
-			IRunnableWithProgress opxml = OprofileCorePlugin.getDefault().getOprofileDataProvider().checkEvents(ctr, event, um, validResult);
+			IRunnableWithProgress opxml = LinuxOpxmlProvider.checkEvents(ctr, event, um, validResult);
 			opxml.run(null);
-		} catch (InvocationTargetException e) {
 		} catch (InterruptedException e) {
-		} catch (OprofileDataException e) {
+		} catch (Throwable e) {
 			OprofileCorePlugin.showErrorDialog("opxmlProvider", e); //$NON-NLS-1$
 			return null;
 		}
@@ -131,13 +130,12 @@ public class OprofileInfoProvider {
 
 		ArrayList<OpModelEvent> sessionList = new ArrayList<OpModelEvent>();
 		try {
-			IRunnableWithProgress opxml = OprofileCorePlugin.getDefault().getOprofileDataProvider().sessions(sessionList);
+			IRunnableWithProgress opxml = LinuxOpxmlProvider.sessions(sessionList);
 			opxml.run(null);
 			events = new OpModelEvent[sessionList.size()];
 			sessionList.toArray(events);
-		} catch (InvocationTargetException e) {
 		} catch (InterruptedException e) {
-		} catch (OprofileDataException e) {
+		} catch (Throwable e) {
 			OprofileCorePlugin.showErrorDialog("opxmlProvider", e); //$NON-NLS-1$
 		}
 		return events;
@@ -153,11 +151,10 @@ public class OprofileInfoProvider {
 
 		final IRunnableWithProgress opxml;
 		try {
-			opxml = OprofileCorePlugin.getDefault().getOprofileDataProvider().modelData(eventName, sessionName, image);
+			opxml = LinuxOpxmlProvider.modelData(eventName, sessionName, image);
 			opxml.run(null);
-		} catch (InvocationTargetException e) {
 		} catch (InterruptedException e) {
-		} catch (OprofileDataException e) {
+		} catch (Throwable e) {
 			OprofileCorePlugin.showErrorDialog("opxmlProvider", e); //$NON-NLS-1$
 			return null;
 		}
@@ -174,13 +171,12 @@ public class OprofileInfoProvider {
 		OpInfo info = new OpInfo();
 
 		try {
-			OpInfoRunner opxml = (OpInfoRunner) OprofileCorePlugin.getDefault().getOprofileDataProvider().info(info);
+			OpInfoRunner opxml = (OpInfoRunner) LinuxOpxmlProvider.info(info);
 			boolean ret = opxml.run0(null);
 			if (ret == false)
 				info = null;
-		} catch (InvocationTargetException e) {
 		} catch (InterruptedException e) {
-		} catch (OprofileDataException e) {
+		} catch (Throwable e) {
 			OprofileCorePlugin.showErrorDialog("opxmlProvider", e); //$NON-NLS-1$
 		}
 

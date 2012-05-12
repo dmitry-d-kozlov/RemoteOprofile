@@ -8,7 +8,7 @@
  * Contributors:
  *    Keith Seitz <keiths@redhat.com> - initial API and implementation
  *    Kent Sebastian <ksebasti@redhat.com> - 
- *    Dmitry Kozlov <ddk@codesourcery.com> - add setOpcontrolProvider
+ *    Dmitry Kozlov <ddk@codesourcery.com> - refactoring
  *******************************************************************************/ 
 
 package org.eclipse.linuxtools.internal.oprofile.core;
@@ -16,7 +16,6 @@ package org.eclipse.linuxtools.internal.oprofile.core;
 import java.io.IOException;
 import java.net.URL;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -25,7 +24,6 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpcontrolProvider;
-import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpxmlProvider;
 import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -38,7 +36,6 @@ public class OprofileCorePlugin extends Plugin {
 
 	//The shared instance.
 	private static OprofileCorePlugin plugin;
-	private IOprofileDataProvider opDataProvider;
 	private IOpcontrolProvider opControlProvider;
 	private IOprofileInfoProvider opInfoProvider;
 
@@ -81,21 +78,7 @@ public class OprofileCorePlugin extends Plugin {
 	}
 
 	public boolean isOprofileInitialized() {
-		return opControlProvider != null && opDataProvider != null & opInfoProvider != null;
-	}
-
-	/**
- 	 * Returns the OprofileDataProvider registered with the plugin or throws an exception
-     * @return the OprofileDataProvider
-	 * @throws OprofileDataException
-	 */
-	public IOprofileDataProvider getOprofileDataProvider() throws OprofileDataException {
-		opDataProvider = new LinuxOpxmlProvider();
-		return opDataProvider;
-	}
-	
-	public void setOprofileDataProvider(IOprofileDataProvider provider) {
-		opDataProvider = provider;
+		return opControlProvider != null && opInfoProvider != null;
 	}
 
 	/** 
@@ -145,16 +128,11 @@ public class OprofileCorePlugin extends Plugin {
 		}
 	}
 
-	public static void showErrorDialog(String errorClassString, CoreException ex) {
-		final IStatus status;
+	public static void showErrorDialog(String errorClassString, Throwable ex) {
 		final String dialogTitle = OprofileProperties.getString(errorClassString + ".error.dialog.title"); //$NON-NLS-1$
 		final String errorMessage = OprofileProperties.getString(errorClassString + ".error.dialog.message"); //$NON-NLS-1$
-		
-		if (ex == null) {
-			status = createErrorStatus(errorClassString, null);
-		} else {
-			status = ex.getStatus();
-		}
+		final String statusMessage = OprofileProperties.getString(errorClassString + ".error.statusMessage"); //$NON-NLS-1$		
+		final IStatus status = new Status(IStatus.ERROR, getId(), IStatus.OK, statusMessage, ex);
 
 		//needs to be run in the ui thread otherwise swt throws invalid thread access 
 		Display.getDefault().syncExec(new Runnable() {
