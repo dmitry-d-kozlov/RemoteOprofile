@@ -9,8 +9,9 @@
  *    Dmitry Kozlov <ddk@codesourcery.com> - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.internal.oprofile.core;
+package org.eclipse.linuxtools.oprofile.core;
 
+import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelImage;
 import org.eclipse.linuxtools.oprofile.core.daemon.OpEvent;

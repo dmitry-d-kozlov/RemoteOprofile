@@ -9,11 +9,12 @@
  *    Keith Seitz <keiths@redhat.com> - initial API and implementation
  *    Dmitry Kozlov <ddk@codesourcery.com> - added runOpReport, runOpHelp, runAddr2Line
  *******************************************************************************/ 
-package org.eclipse.linuxtools.internal.oprofile.core;
+package org.eclipse.linuxtools.oprofile.core;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.oprofile.core.daemon.OprofileDaemonEvent;
 import org.eclipse.linuxtools.oprofile.core.daemon.OprofileDaemonOptions;
 

@@ -11,7 +11,7 @@
  *    Dmitry Kozlov <ddk@codesourcery.com> - refactoring
  *******************************************************************************/ 
 
-package org.eclipse.linuxtools.internal.oprofile.core;
+package org.eclipse.linuxtools.oprofile.core;
 
 import java.io.IOException;
 import java.net.URL;
@@ -23,6 +23,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
+import org.eclipse.linuxtools.internal.oprofile.core.OprofileProperties;
 import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpcontrolProvider;
 import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
