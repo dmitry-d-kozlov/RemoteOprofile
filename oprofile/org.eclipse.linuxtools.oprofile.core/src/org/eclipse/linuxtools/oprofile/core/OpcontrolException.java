@@ -9,7 +9,7 @@
  *    Keith Seitz <keiths@redhat.com> - initial API and implementation
  *    Kent Sebastian <ksebasti@redhat.com> - 
  *******************************************************************************/ 
-package org.eclipse.linuxtools.internal.oprofile.core;
+package org.eclipse.linuxtools.oprofile.core;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;

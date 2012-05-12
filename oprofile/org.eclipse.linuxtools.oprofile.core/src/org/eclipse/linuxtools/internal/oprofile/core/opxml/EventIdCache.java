@@ -13,9 +13,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.info.InfoAdapter;
 import org.eclipse.linuxtools.oprofile.core.IOpcontrolProvider;
+import org.eclipse.linuxtools.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.oprofile.core.OprofileCorePlugin;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

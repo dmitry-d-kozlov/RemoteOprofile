@@ -18,8 +18,8 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.eclipse.core.runtime.Status;
-import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileProperties;
+import org.eclipse.linuxtools.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.oprofile.core.OprofileCorePlugin;
 import org.eclipse.osgi.util.NLS;
 

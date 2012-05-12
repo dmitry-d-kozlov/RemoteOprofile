@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileProperties;
 import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpcontrolProvider;
 import org.eclipse.swt.widgets.Display;

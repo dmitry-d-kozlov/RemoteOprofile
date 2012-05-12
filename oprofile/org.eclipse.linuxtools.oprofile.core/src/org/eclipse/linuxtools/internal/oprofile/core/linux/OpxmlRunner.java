@@ -28,7 +28,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.AbstractDataAdapter;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.OprofileSAXHandler;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.XMLProcessor;
@@ -36,6 +35,7 @@ import org.eclipse.linuxtools.internal.oprofile.core.opxml.checkevent.CheckEvent
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.info.InfoAdapter;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.modeldata.ModelDataAdapter;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.sessions.SessionManager;
+import org.eclipse.linuxtools.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.oprofile.core.OprofileCorePlugin;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

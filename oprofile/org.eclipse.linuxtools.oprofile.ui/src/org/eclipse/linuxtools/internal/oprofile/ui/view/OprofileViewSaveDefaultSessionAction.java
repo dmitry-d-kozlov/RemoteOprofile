@@ -19,7 +19,6 @@ import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
-import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileInfoProvider;
 import org.eclipse.linuxtools.internal.oprofile.ui.OprofileUiMessages;
 import org.eclipse.linuxtools.internal.oprofile.ui.OprofileUiPlugin;
@@ -27,6 +26,7 @@ import org.eclipse.linuxtools.internal.oprofile.ui.model.IUiModelElement;
 import org.eclipse.linuxtools.internal.oprofile.ui.model.UiModelError;
 import org.eclipse.linuxtools.internal.oprofile.ui.model.UiModelRoot;
 import org.eclipse.linuxtools.internal.oprofile.ui.model.UiModelSession;
+import org.eclipse.linuxtools.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.oprofile.core.OprofileCorePlugin;
 
 /**
