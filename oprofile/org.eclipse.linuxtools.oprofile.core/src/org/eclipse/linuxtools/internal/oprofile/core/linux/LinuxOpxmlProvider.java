@@ -16,7 +16,6 @@ import java.util.ArrayList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.linuxtools.internal.oprofile.core.IOprofileDataProvider;
 import org.eclipse.linuxtools.internal.oprofile.core.daemon.OpInfo;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelEvent;
 import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelImage;
@@ -25,16 +24,16 @@ import org.eclipse.linuxtools.internal.oprofile.core.opxml.modeldata.ModelDataPr
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.sessions.SessionsProcessor;
 
 /**
- * A class which implements the IOpxmlProvider interface for running opxml.
+ * A class which runs queries to opxml to fetch oprofile data used by IOprofileInfoProvider
  */
-public class LinuxOpxmlProvider implements IOprofileDataProvider {
+public class LinuxOpxmlProvider {
 	
-	public IRunnableWithProgress info(final OpInfo info) {
+	public static IRunnableWithProgress info(final OpInfo info) {
 		return new OpInfoRunner(info);
 	}
 
 	//public because it is used in OpInfo.java:getInfo()
-	public class OpInfoRunner implements IRunnableWithProgress {
+	public static class OpInfoRunner implements IRunnableWithProgress {
 		private boolean b;
 		final private OpInfo info;
 		
@@ -56,7 +55,7 @@ public class LinuxOpxmlProvider implements IOprofileDataProvider {
 		}
 	}
 	
-	public IRunnableWithProgress modelData(final String eventName, final String sessionName, final OpModelImage image) {
+	public static IRunnableWithProgress modelData(final String eventName, final String sessionName, final OpModelImage image) {
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {	
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				OpxmlRunner runner = new OpxmlRunner();
@@ -75,7 +74,7 @@ public class LinuxOpxmlProvider implements IOprofileDataProvider {
 		return runnable;
 	}
 		
-	public IRunnableWithProgress checkEvents(final int ctr, final String event, final int um, final int[] eventValid) {
+	public static IRunnableWithProgress checkEvents(final int ctr, final String event, final int um, final int[] eventValid) {
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) {
 				OpxmlRunner runner = new OpxmlRunner();
@@ -92,7 +91,7 @@ public class LinuxOpxmlProvider implements IOprofileDataProvider {
 		return runnable;
 	}
 	
-	public IRunnableWithProgress sessions(final ArrayList<OpModelEvent> sessionList) {
+	public static IRunnableWithProgress sessions(final ArrayList<OpModelEvent> sessionList) {
 		
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) {
