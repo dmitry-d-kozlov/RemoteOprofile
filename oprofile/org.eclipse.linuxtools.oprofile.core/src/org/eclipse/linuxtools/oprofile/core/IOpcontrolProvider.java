@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.oprofile.core;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.linuxtools.oprofile.core.daemon.OprofileDaemonEvent;
 import org.eclipse.linuxtools.oprofile.core.daemon.OprofileDaemonOptions;
 
@@ -118,5 +119,16 @@ public interface IOpcontrolProvider {
 	 * @throws OpcontrolException
 	 */
 	public InputStream runAddr2Line(ArrayList<String> args) throws OpcontrolException;
+
+	/**
+	 * Get current project associated with this IOpcontrolProvider instance
+	 * @return current project
+	 */
+	public IProject getCurrentProject();
+
+	/**
+	 * Set current project associated with this IOpcontrolProvider instance
+	 */
+	public void setCurrentProject(IProject project);
 
 }

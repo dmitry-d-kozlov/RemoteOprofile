@@ -213,8 +213,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	 * entered the password
 	 */
 	private boolean runOpcontrol(ArrayList<String> args) throws OpcontrolException {	
-		IProject project = LinuxOpcontrolProvider.getCurrentProject();
-		
+		IProject project = OprofileCorePlugin.getDefault().getOpcontrolProvider().getCurrentProject();
 		
 		// If no linuxtools' toolchain is defined for this project, use the path for the
 		// link created by the installation script
@@ -303,7 +302,8 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	}
 	
 	private static String findOpcontrol() throws OpcontrolException {
-		IProject project = LinuxOpcontrolProvider.getCurrentProject();
+		IProject project = OprofileCorePlugin.getDefault().getOpcontrolProvider().getCurrentProject();
+
 		URL url = FileLocator.find(Platform.getBundle(OprofileCorePlugin
 				.getId()), new Path(OprofileConstants.OPCONTROL_REL_PATH), null);
 
@@ -386,12 +386,12 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 		return runCommand(args);
 	}
 
-	public static IProject getCurrentProject(){
+	public IProject getCurrentProject(){
 		return currentProject;
 	}
 
 	// Reloads oprofile modules by calling 'opcontrol --deinit' and 'opcontrol --init'
-	public static void setCurrentProject(IProject project){
+	public void setCurrentProject(IProject project){
 
 		if(currentProject == null){
 			currentProject = project;
@@ -486,7 +486,8 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 		final StringBuilder errorOutput = new StringBuilder();
 		Thread errReaderThread = null;
 		try {
-			Process p = RuntimeProcessFactory.getFactory().exec(args.toArray(new String[]{}), LinuxOpcontrolProvider.getCurrentProject());
+			IProject project = OprofileCorePlugin.getDefault().getOpcontrolProvider().getCurrentProject();
+			Process p = RuntimeProcessFactory.getFactory().exec(args.toArray(new String[]{}), project);
 
 			final BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			final BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));

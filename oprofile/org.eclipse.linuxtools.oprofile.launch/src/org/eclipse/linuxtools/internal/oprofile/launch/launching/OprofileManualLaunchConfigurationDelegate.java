@@ -22,7 +22,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpcontrolProvider;
 import org.eclipse.linuxtools.internal.oprofile.launch.OprofileLaunchMessages;
 import org.eclipse.linuxtools.internal.oprofile.launch.configuration.LaunchOptions;
 import org.eclipse.linuxtools.internal.oprofile.ui.view.OprofileViewSaveDefaultSessionAction;
@@ -46,11 +45,13 @@ import org.eclipse.ui.PlatformUI;
 public class OprofileManualLaunchConfigurationDelegate extends AbstractOprofileLaunchConfigurationDelegate {
 	@Override
 	protected boolean preExec(LaunchOptions options, OprofileDaemonEvent[] daemonEvents) {
-		// Set current project to allow using the oprofile path that
-		// was chosen for the project
-		LinuxOpcontrolProvider.setCurrentProject(getProject());
-//		//set up the oprofile daemon
-//		try {
+
+		try {
+			// Set current project to allow using the oprofile path that
+			// was chosen for the project
+			OprofileCorePlugin.getDefault().getOpcontrolProvider().setCurrentProject(getProject());
+
+//			//set up the oprofile daemon
 //			//kill the daemon (it shouldn't be running already, but to be safe)
 //			oprofileShutdown();
 //			
@@ -61,10 +62,10 @@ public class OprofileManualLaunchConfigurationDelegate extends AbstractOprofileL
 //			
 //			//setup the events and other parameters
 //			oprofileSetupDaemon(options.getOprofileDaemonOptions(), daemonEvents);
-//		} catch (OpcontrolException oe) {
-//			OprofileCorePlugin.showErrorDialog("opcontrolProvider", oe); //$NON-NLS-1$
-//			return;
-//		}
+		} catch (OpcontrolException oe) {
+			OprofileCorePlugin.showErrorDialog("opcontrolProvider", oe); //$NON-NLS-1$
+			return false;
+		}
 		return true;
 	}
 

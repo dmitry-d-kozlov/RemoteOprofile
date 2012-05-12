@@ -37,7 +37,6 @@ import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.linuxtools.internal.oprofile.core.OprofileInfoProvider;
 import org.eclipse.linuxtools.internal.oprofile.launch.OprofileLaunchMessages;
 import org.eclipse.linuxtools.internal.oprofile.launch.OprofileLaunchPlugin;
 import org.eclipse.linuxtools.oprofile.core.OprofileCorePlugin;
@@ -290,7 +289,7 @@ public class OprofileEventConfigTab extends AbstractLaunchConfigurationTab {
 	 * @return true if oprofile is in timer mode, false otherwise
 	 */
 	protected boolean getTimerMode() {
-		return OprofileInfoProvider.getTimerMode();
+		return OprofileCorePlugin.getDefault().getOprofileInfoProvider().getTimerMode();
 	}
 	
 	/**
@@ -298,7 +297,7 @@ public class OprofileEventConfigTab extends AbstractLaunchConfigurationTab {
 	 * @return int number of counters
 	 */
 	protected int getNumberOfCounters() {
-		return OprofileInfoProvider.getNumberOfCounters();
+		return OprofileCorePlugin.getDefault().getOprofileInfoProvider().getNumberOfCounters();
 	}
 	
 	/**
