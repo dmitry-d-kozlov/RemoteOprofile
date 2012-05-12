@@ -8,7 +8,7 @@
  * Contributors:
  *    Keith Seitz <keiths@redhat.com> - initial API and implementation
  *    Kent Sebastian <ksebasti@redhat.com>
- *    Dmitry Kozlov <ddk@codesourcery.com> - added runOpReport
+ *    Dmitry Kozlov <ddk@codesourcery.com> - added runOpReport, runOpHelp, runAddr2Line
  *******************************************************************************/ 
 package org.eclipse.linuxtools.internal.oprofile.core.linux;
 
