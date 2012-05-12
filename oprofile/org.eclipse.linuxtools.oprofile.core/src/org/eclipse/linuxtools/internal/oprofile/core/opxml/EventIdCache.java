@@ -5,15 +5,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpcontrolProvider;
+import org.eclipse.linuxtools.internal.oprofile.core.IOpcontrolProvider;
+import org.eclipse.linuxtools.internal.oprofile.core.OpcontrolException;
+import org.eclipse.linuxtools.internal.oprofile.core.OprofileCorePlugin;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.info.InfoAdapter;
-import org.eclipse.linuxtools.tools.launch.core.factory.RuntimeProcessFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -33,7 +36,6 @@ public class EventIdCache {
 	private static final String HEADER = "header"; //$NON-NLS-1$
 	private static final String SCHEMA = "schemaversion"; //$NON-NLS-1$
 	private static final String CATEGORY = "category"; //$NON-NLS-1$
-	private static final String OPHELP = "ophelp"; //$NON-NLS-1$
 	private static final String EVENT = "event"; //$NON-NLS-1$
 	private static final String EVENT_NAME = "event_name"; //$NON-NLS-1$
 
@@ -81,13 +83,14 @@ public class EventIdCache {
 	 */
 	private void readXML() {
 		try {
-			Process p = RuntimeProcessFactory.getFactory().exec(OPHELP + " " + "-X", LinuxOpcontrolProvider.getCurrentProject());
+			IOpcontrolProvider opc = OprofileCorePlugin.getDefault().getOpcontrolProvider();
+			InputStream is = opc.runOpHelp(new ArrayList<String>());
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder;
 			try {
 				builder = factory.newDocumentBuilder();
 				try {
-					single.eventDoc = builder.parse(p.getInputStream());
+					single.eventDoc = builder.parse(is);
 					Element elem = (Element) single.eventDoc.getElementsByTagName(HELP_EVENTS).item(0);
 					single.eventRoot = elem;
 				} catch (IOException e) {
@@ -97,7 +100,7 @@ public class EventIdCache {
 				e1.printStackTrace();
 			}
 			
-		} catch (IOException e) {
+		} catch (OpcontrolException e) {
 			e.printStackTrace();
 		}
 	}
