@@ -9,7 +9,7 @@
  *    Kent Sebastian <ksebasti@redhat.com> - initial API and implementation 
  *******************************************************************************/ 
 
-package org.eclipse.linuxtools.internal.oprofile.core.model;
+package org.eclipse.linuxtools.oprofile.core.model;
 
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileInfoProvider;
 

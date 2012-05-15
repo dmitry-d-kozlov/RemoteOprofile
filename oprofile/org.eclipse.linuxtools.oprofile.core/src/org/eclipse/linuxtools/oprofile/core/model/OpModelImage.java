@@ -9,7 +9,7 @@
  *    Keith Seitz <keiths@redhat.com> - initial API and implementation
  *    Kent Sebastian <ksebasti@redhat.com> - 
  *******************************************************************************/ 
-package org.eclipse.linuxtools.internal.oprofile.core.model;
+package org.eclipse.linuxtools.oprofile.core.model;
 
 
 /**

@@ -10,10 +10,10 @@
  *******************************************************************************/ 
 package org.eclipse.linuxtools.internal.oprofile.ui.model;
 
-import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelImage;
-import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelSymbol;
 import org.eclipse.linuxtools.internal.oprofile.ui.OprofileUiMessages;
 import org.eclipse.linuxtools.internal.oprofile.ui.OprofileUiPlugin;
+import org.eclipse.linuxtools.oprofile.core.model.OpModelImage;
+import org.eclipse.linuxtools.oprofile.core.model.OpModelSymbol;
 import org.eclipse.swt.graphics.Image;
 
 /**

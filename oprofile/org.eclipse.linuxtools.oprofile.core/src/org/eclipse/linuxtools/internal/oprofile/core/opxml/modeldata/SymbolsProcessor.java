@@ -12,9 +12,9 @@ package org.eclipse.linuxtools.internal.oprofile.core.opxml.modeldata;
 
 import java.util.ArrayList;
 
-import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelSymbol;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.OprofileSAXHandler;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.XMLProcessor;
+import org.eclipse.linuxtools.oprofile.core.model.OpModelSymbol;
 import org.xml.sax.Attributes;
 
 /**

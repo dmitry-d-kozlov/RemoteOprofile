@@ -12,7 +12,7 @@ package org.eclipse.linuxtools.oprofile.ui.tests;
 
 import junit.framework.TestCase;
 
-import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelEvent;
+import org.eclipse.linuxtools.oprofile.core.model.OpModelEvent;
 import org.eclipse.linuxtools.oprofile.tests.TestPlugin;
 import org.eclipse.linuxtools.oprofile.tests.TestingOpModelRoot;
 import org.eclipse.linuxtools.internal.oprofile.ui.model.IUiModelElement;

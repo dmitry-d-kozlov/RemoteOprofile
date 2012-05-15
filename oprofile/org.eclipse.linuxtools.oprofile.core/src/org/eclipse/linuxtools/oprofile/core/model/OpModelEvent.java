@@ -10,7 +10,7 @@
  *    Kent Sebastian <ksebasti@redhat.com> - 
  *******************************************************************************/ 
 
-package org.eclipse.linuxtools.internal.oprofile.core.model;
+package org.eclipse.linuxtools.oprofile.core.model;
 
 /**
  * A class which represents the event collected in a given session.

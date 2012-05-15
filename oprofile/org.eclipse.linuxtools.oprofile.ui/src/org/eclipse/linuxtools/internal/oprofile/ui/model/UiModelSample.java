@@ -10,9 +10,9 @@
  *******************************************************************************/ 
 package org.eclipse.linuxtools.internal.oprofile.ui.model;
 
-import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelSample;
 import org.eclipse.linuxtools.internal.oprofile.ui.OprofileUiMessages;
 import org.eclipse.linuxtools.internal.oprofile.ui.OprofileUiPlugin;
+import org.eclipse.linuxtools.oprofile.core.model.OpModelSample;
 import org.eclipse.swt.graphics.Image;
 
 public class UiModelSample implements IUiModelElement {

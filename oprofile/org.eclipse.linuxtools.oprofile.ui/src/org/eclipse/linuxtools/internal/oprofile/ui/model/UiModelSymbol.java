@@ -13,10 +13,10 @@ package org.eclipse.linuxtools.internal.oprofile.ui.model;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelSample;
-import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelSymbol;
 import org.eclipse.linuxtools.internal.oprofile.ui.OprofileUiMessages;
 import org.eclipse.linuxtools.internal.oprofile.ui.OprofileUiPlugin;
+import org.eclipse.linuxtools.oprofile.core.model.OpModelSample;
+import org.eclipse.linuxtools.oprofile.core.model.OpModelSymbol;
 import org.eclipse.swt.graphics.Image;
 
 /**

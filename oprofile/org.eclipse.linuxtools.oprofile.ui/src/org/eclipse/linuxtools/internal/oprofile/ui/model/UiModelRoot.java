@@ -10,8 +10,8 @@
  *******************************************************************************/ 
 package org.eclipse.linuxtools.internal.oprofile.ui.model;
 
-import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelEvent;
-import org.eclipse.linuxtools.internal.oprofile.core.model.OpModelRoot;
+import org.eclipse.linuxtools.oprofile.core.model.OpModelEvent;
+import org.eclipse.linuxtools.oprofile.core.model.OpModelRoot;
 import org.eclipse.swt.graphics.Image;
 
 /**

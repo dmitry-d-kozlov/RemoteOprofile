@@ -24,8 +24,9 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.linuxtools.internal.oprofile.core.OprofileInfoProvider;
 import org.eclipse.linuxtools.internal.oprofile.ui.OprofileUiMessages;
+import org.eclipse.linuxtools.oprofile.core.IOprofileInfoProvider;
+import org.eclipse.linuxtools.oprofile.core.OprofileCorePlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -73,7 +74,8 @@ class LogReader implements Runnable, IRunnableWithProgress {
 	private static String contents = null;
 
 	public void run() {
-		File logFile = new File(OprofileInfoProvider.getLogFile());
+		IOprofileInfoProvider oi = OprofileCorePlugin.getDefault().getOprofileInfoProvider();
+		File logFile = new File(oi.getLogFile());
 		long modified = logFile.lastModified();
 		
 		//only reread it if it has been modified since the last run
