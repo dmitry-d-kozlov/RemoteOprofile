@@ -11,9 +11,11 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.4.0",
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: oprofile-core.jar
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.linuxtools.oprofile.core,
+Export-Package: org.eclipse.linuxtools.internal.oprofile.core.opxml;x-friends:="org.eclipse.linuxtools.oprofile.core.tests,org.eclipse.linuxtools.oprofile.tests",
+ org.eclipse.linuxtools.internal.oprofile.core.opxml.modeldata;x-friends:="org.eclipse.linuxtools.oprofile.core.tests,org.eclipse.linuxtools.oprofile.tests",
+ org.eclipse.linuxtools.oprofile.core,
  org.eclipse.linuxtools.oprofile.core.daemon,
-  org.eclipse.linuxtools.oprofile.core.model
+ org.eclipse.linuxtools.oprofile.core.model
 Bundle-Localization: plugin
 Eclipse-BundleShape: dir
 Import-Package: org.eclipse.core.resources
