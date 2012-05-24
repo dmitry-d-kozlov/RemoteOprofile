@@ -87,7 +87,7 @@ public abstract class AbstractOprofileLaunchConfigurationDelegate extends Profil
 			String[] commandArray = (String[])command.toArray( new String[command.size()] );
 			boolean usePty = config.getAttribute(ICDTLaunchConfigurationConstants.ATTR_USE_TERMINAL, ICDTLaunchConfigurationConstants.USE_TERMINAL_DEFAULT);
 			Process process;
-			process = execute( commandArray, getEnvironment( config ), wd, usePty );
+			process = execute( commandArray, getEnvironmentArray( config ), wd, usePty );
 			DebugPlugin.newProcess( launch, process, renderProcessLabel( commandArray[0] ) );
 
 			postExec(options, daemonEvents, launch, process);

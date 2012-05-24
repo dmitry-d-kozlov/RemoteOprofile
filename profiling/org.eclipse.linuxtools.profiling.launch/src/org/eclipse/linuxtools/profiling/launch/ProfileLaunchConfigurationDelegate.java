@@ -79,7 +79,7 @@ public abstract class ProfileLaunchConfigurationDelegate extends AbstractCLaunch
 		out.write(data.getBytes());
 		
 		String[] commandArray = prepareCommand("sh " + script.getAbsolutePath());
-		Process subProcess = execute(commandArray, getEnvironment(config),
+		Process subProcess = execute(commandArray, getEnvironmentArray(config),
 				workDir, true);
 		
 		IProcess process = createNewProcess(launch, subProcess,commandArray[0]);
