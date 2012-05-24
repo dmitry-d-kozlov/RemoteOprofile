@@ -39,6 +39,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.linuxtools.internal.oprofile.launch.OprofileLaunchMessages;
 import org.eclipse.linuxtools.internal.oprofile.launch.OprofileLaunchPlugin;
+import org.eclipse.linuxtools.oprofile.core.OpcontrolException;
 import org.eclipse.linuxtools.oprofile.core.OprofileCorePlugin;
 import org.eclipse.linuxtools.oprofile.core.daemon.OpEvent;
 import org.eclipse.linuxtools.oprofile.core.daemon.OpUnitMask;
@@ -60,13 +61,24 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Thic class represents the event configuration tab of the launcher dialog.
+ * This class represents the event configuration tab of the launcher dialog.
  */
 public class OprofileEventConfigTab extends AbstractLaunchConfigurationTab {
 	protected Button defaultEventCheck;
-	protected OprofileCounter[] counters = OprofileCounter.getCounters(null);
+	protected OprofileCounter[] counters = new OprofileCounter[]{};
 	protected CounterSubTab[] counterSubTabs;
 
+	public OprofileEventConfigTab() {
+		super();
+		if ( !OprofileCorePlugin.getDefault().isOprofileInitialized() ) {
+			try {
+				OprofileCorePlugin.getDefault().getOpcontrolProvider().initModule();
+				counters = OprofileCounter.getCounters(null);
+			} catch (OpcontrolException e) {
+				OprofileCorePlugin.showErrorDialog("opcontrolProvider", e); //$NON-NLS-1$
+			}
+		}
+	}
 	/**
 	 * Essentially the constructor for this tab; creates the 'default event'
 	 * checkbox and an appropriate number of counter tabs.
@@ -96,7 +108,7 @@ public class OprofileEventConfigTab extends AbstractLaunchConfigurationTab {
 			createVerticalSpacer(top, 1);
 	
 			//tabs for each of the counters
-			OprofileCounter[] counters = OprofileCounter.getCounters(null);
+			counters = OprofileCounter.getCounters(null);
 			TabItem[] counterTabs = new TabItem[counters.length];
 			counterSubTabs = new CounterSubTab[counters.length];
 			

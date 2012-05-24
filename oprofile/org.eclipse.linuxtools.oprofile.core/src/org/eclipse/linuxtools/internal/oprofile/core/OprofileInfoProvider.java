@@ -16,10 +16,10 @@ package org.eclipse.linuxtools.internal.oprofile.core;
 import java.util.ArrayList;
 
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpcontrolProvider;
 import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpxmlProvider;
 import org.eclipse.linuxtools.internal.oprofile.core.linux.LinuxOpxmlProvider.OpInfoRunner;
 import org.eclipse.linuxtools.internal.oprofile.core.opxml.checkevent.CheckEventsProcessor;
+import org.eclipse.linuxtools.oprofile.core.IOprofileInfoProvider;
 import org.eclipse.linuxtools.oprofile.core.OprofileCorePlugin;
 import org.eclipse.linuxtools.oprofile.core.daemon.OpEvent;
 import org.eclipse.linuxtools.oprofile.core.daemon.OpInfo;
@@ -31,27 +31,25 @@ import org.eclipse.linuxtools.oprofile.core.model.OpModelImage;
  * Common implementation for IOprofileInfoProvider which uses IOprofileDataProvider
  * as underlying layer which performs queries to OProfile.
  */
-public class OprofileInfoProvider {
+public class OprofileInfoProvider implements IOprofileInfoProvider {
 	// Oprofile information
-	public static OpInfo info;
+	public OpInfo info;
 
 	/**
 	 * Queries oprofile for the number of counters on the current CPU.
 	 * Used only in launch config tabs.
 	 * @return the number of counters
 	 */
-	public static int getNumberOfCounters() {
-		if (!LinuxOpcontrolProvider.isKernelModuleLoaded()){
-			return 0;
-		}
-		return info.getNrCounters();
+	public int getNumberOfCounters() {
+		// In case of oprofile startup error return zero counters
+		return info == null ? 0 : info.getNrCounters();
 	}
 
 	/**
 	 * Returns the CPU speed of the current configuration.
 	 * @return the cpu speed in MHz
 	 */
-	public static double getCpuFrequency() {
+	public double getCpuFrequency() {
 		return info.getCPUSpeed();
 	}
 
@@ -60,7 +58,7 @@ public class OprofileInfoProvider {
 	 * @param name the event's name (i.e., CPU_CLK_UNHALTED)
 	 * @return the event or <code>null</code> if not found
 	 */
-	public static OpEvent findEvent(String name) {
+	public OpEvent findEvent(String name) {
 		return info.findEvent(name);
 	}
 
@@ -69,7 +67,7 @@ public class OprofileInfoProvider {
 	 * @param num the counter number
 	 * @return an array of all valid events -- NEVER RETURNS NULL!
 	 */
-	public static OpEvent[] getEvents(int num) {
+	public OpEvent[] getEvents(int num) {
 		return info.getEvents(num);
 	}
 
@@ -77,7 +75,7 @@ public class OprofileInfoProvider {
 	 * Returns the default location of the oprofile samples directory.
 	 * @return the default samples directory
 	 */
-	public static String getDefaultSamplesDirectory() {
+	public String getDefaultSamplesDirectory() {
 		return info.getDefault(OpInfo.DEFAULT_SAMPLE_DIR);
 	}
 
@@ -85,7 +83,7 @@ public class OprofileInfoProvider {
 	 * Returns the oprofile daemon log file.
 	 * @return the log file (absolute pathname)
 	 */
-	public static String getLogFile() {
+	public String getLogFile() {
 		return info.getDefault(OpInfo.DEFAULT_LOG_FILE);
 	}
 
@@ -93,11 +91,9 @@ public class OprofileInfoProvider {
 	 * Returns whether or not oprofile is in timer mode.
 	 * @return true if oprofile is in timer mode, false otherwise
 	 */
-	public static boolean getTimerMode() {
-		if (! LinuxOpcontrolProvider.isKernelModuleLoaded()){
-			return true;
-		}
-		return info.getTimerMode();
+	public boolean getTimerMode() {
+		// in case of oprofile startup error return true 
+		return info == null ? true : info.getTimerMode();
 	}
 
 	/**
@@ -107,7 +103,7 @@ public class OprofileInfoProvider {
 	 * @param um	the unit mask
 	 * @return whether the requested event is valid
 	 */
-	public static Boolean checkEvent(int ctr, String event, int um) {
+	public Boolean checkEvent(int ctr, String event, int um) {
 		int[] validResult = new int[1];
 		try {
 			IRunnableWithProgress opxml = LinuxOpxmlProvider.checkEvents(ctr, event, um, validResult);
@@ -126,7 +122,7 @@ public class OprofileInfoProvider {
 	 * the sessions under each of them.
 	 * @returns a list of all collected events
 	 */
-	public static OpModelEvent[] getEvents() {
+	public OpModelEvent[] getEvents() {
 		OpModelEvent[] events = null;
 
 		ArrayList<OpModelEvent> sessionList = new ArrayList<OpModelEvent>();
@@ -147,7 +143,7 @@ public class OprofileInfoProvider {
 	 * @param session the session for which to get samples
 	 * @param shell the composite shell to use for the progress dialog
 	 */
-	public static OpModelImage getModelData(String eventName, String sessionName) {
+	public OpModelImage getModelData(String eventName, String sessionName) {
 		OpModelImage image = new OpModelImage();
 
 		final IRunnableWithProgress opxml;
@@ -167,9 +163,9 @@ public class OprofileInfoProvider {
 	 * Return all of Oprofile's generic information.
 	 * @return a class containing the information
 	 */
-	public static OpInfo getInfo() {
+	public OpInfo fetchInfo() {
 		// Run opmxl and get the static information
-		OpInfo info = new OpInfo();
+		info = new OpInfo();
 
 		try {
 			OpInfoRunner opxml = (OpInfoRunner) LinuxOpxmlProvider.info(info);

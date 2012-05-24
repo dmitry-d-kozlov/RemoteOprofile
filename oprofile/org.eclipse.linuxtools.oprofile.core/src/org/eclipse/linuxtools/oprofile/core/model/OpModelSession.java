@@ -11,7 +11,11 @@
 
 package org.eclipse.linuxtools.oprofile.core.model;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.linuxtools.internal.oprofile.core.OprofileInfoProvider;
+import org.eclipse.linuxtools.internal.oprofile.core.OprofileProperties;
+import org.eclipse.linuxtools.oprofile.core.OpcontrolException;
+import org.eclipse.linuxtools.oprofile.core.OprofileCorePlugin;
 
 
 /**
@@ -62,7 +66,12 @@ public class OpModelSession {
 	}
 	
 	protected OpModelImage getNewImage() {
-		return OprofileInfoProvider.getModelData(parentEvent.getName(), name);
+		try {
+			return OprofileCorePlugin.getDefault().getOprofileInfoProvider().getModelData(parentEvent.getName(), name);
+		} catch (OpcontrolException e) {
+			OprofileCorePlugin.log(IStatus.ERROR, OprofileProperties.getString("opxmlParse.error.dialog.message"), e);
+			return null;
+		}
 	}
 
 	public String toString(String tabs) {

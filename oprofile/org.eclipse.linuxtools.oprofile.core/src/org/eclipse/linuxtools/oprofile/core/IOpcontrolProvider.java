@@ -25,6 +25,12 @@ import org.eclipse.linuxtools.oprofile.core.daemon.OprofileDaemonOptions;
 public interface IOpcontrolProvider {
 	
 	/**
+	 * Check if oprofile kernel module is loaded
+	 * @return true iff kernel modile is loaded
+	 */
+	public boolean isKernelModuleLoaded();
+
+	/**
 	 * Initialize the Oprofile kernel module
 	 * @throws OpcontrolException
 	 */

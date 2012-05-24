@@ -8,7 +8,7 @@
  * Contributors:
  *    Keith Seitz <keiths@redhat.com> - initial API and implementation
  *    Kent Sebastian <ksebasti@redhat.com>
- *    Dmitry Kozlov <ddk@codesourcery.com> - added runOpReport, runOpHelp, runAddr2Line
+ *    Dmitry Kozlov <ddk@codesourcery.com> - refactored, added runOpReport, runOpHelp, runAddr2Line
  *******************************************************************************/ 
 package org.eclipse.linuxtools.internal.oprofile.core.linux;
 
@@ -54,13 +54,45 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 
 	// Project that will be profiled.
 	public static IProject currentProject;
-	static {
-		initializeOprofileModule();
-	}
-	
 	
 	public LinuxOpcontrolProvider() throws OpcontrolException {
 		opcontrolProgram = findOpcontrol();
+	}
+
+
+	public boolean isKernelModuleLoaded() {
+		// This requires more inside knowledge about Oprofile than one would like,
+		// but it is the only way of knowing whether the module is loaded (and we can
+		// succesfully call into the oprofile wrapper library without causing it to print out
+		// a lot of warnings).
+		for (int i = 0; i < OprofileConstants.OPROFILE_CPU_TYPE_FILES.length; ++i) {
+			File f = new File(OprofileConstants.OPROFILE_CPU_TYPE_FILES[i]);
+			if (f.exists())
+				return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Loads the kernel module and oprofilefs and fetch oprofile information
+	 * @throws OpcontrolException
+	 */
+	public void initModule() throws OpcontrolException {
+		if ( !isKernelModuleLoaded()) {
+			// try to load oprofile kernel module by calling `opcontrol --init`
+			runOpcontrol(OprofileConstants.OPD_INIT_MODULE);
+			// if kernel module is still not have loaded report critical error
+			if (! isKernelModuleLoaded() ) {
+				throw new OpcontrolException(OprofileCorePlugin.createErrorStatus(OprofileProperties.getString("fatal.kernelModuleNotLoaded"), null));
+			}
+		}
+		// fetch oprofile info
+		OprofileInfoProvider opInfoProvider = new OprofileInfoProvider();
+		if ( opInfoProvider.fetchInfo() == null ) {
+			throw new OpcontrolException(OprofileCorePlugin.createErrorStatus(OprofileProperties.getString("fatal.opinfoNotParsed"), null));
+		}
+		OprofileCorePlugin.getDefault().setOprofileInfoProvider(opInfoProvider);
 	}
 
 	/**
@@ -69,6 +101,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	 */
 	public void deinitModule() throws OpcontrolException {
 		runOpcontrol(OprofileConstants.OPD_DEINIT_MODULE);
+		OprofileCorePlugin.getDefault().setOprofileInfoProvider(null);
 	}
 	
 	/**
@@ -78,15 +111,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	public void dumpSamples() throws OpcontrolException {
 		runOpcontrol(OprofileConstants.OPD_DUMP);
 	}
-	
-	/**
-	 * Loads the kernel module and oprofilefs
-	 * @throws OpcontrolException
-	 */
-	public void initModule() throws OpcontrolException {
-		runOpcontrol(OprofileConstants.OPD_INIT_MODULE);
-	}
-	
+
 	/**
 	 * Clears out data from current session
 	 * @throws OpcontrolException
@@ -146,7 +171,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 		ArrayList<String> args = new ArrayList<String>();
 		args.add(OprofileConstants.OPD_SETUP);
 		optionsToArguments(args, options);
-		if (!OprofileInfoProvider.getTimerMode()) {
+		if (!OprofileCorePlugin.getDefault().getOprofileInfoProvider().getTimerMode()) {
 			if (events == null || events.length == 0) {
 				args.add(OprofileConstants.OPD_SETUP_EVENT + OprofileConstants.OPD_SETUP_EVENT_DEFAULT);
 			} else {
@@ -302,8 +327,6 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	}
 	
 	private static String findOpcontrol() throws OpcontrolException {
-		IProject project = OprofileCorePlugin.getDefault().getOpcontrolProvider().getCurrentProject();
-
 		URL url = FileLocator.find(Platform.getBundle(OprofileCorePlugin
 				.getId()), new Path(OprofileConstants.OPCONTROL_REL_PATH), null);
 
@@ -314,7 +337,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 			}
 		// If no linuxtools' toolchain is defined for this project and oprofile is not
 		// installed, throw exception
-		} else if(project == null || LinuxtoolsPathProperty.getInstance().getLinuxtoolsPath(project).equals("")){
+		} else if(currentProject == null || LinuxtoolsPathProperty.getInstance().getLinuxtoolsPath(currentProject).equals("")){
 			throw new OpcontrolException(OprofileCorePlugin.createErrorStatus(
 					"opcontrolProvider", null)); //$NON-NLS-1$
 		}
@@ -392,82 +415,25 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 
 	// Reloads oprofile modules by calling 'opcontrol --deinit' and 'opcontrol --init'
 	public void setCurrentProject(IProject project){
-
-		if(currentProject == null){
-			currentProject = project;
-			initializeOprofileModule();
-		} else {
-			String currentPath = LinuxtoolsPathProperty.getInstance().getLinuxtoolsPath(currentProject);
-			String newPath = LinuxtoolsPathProperty.getInstance().getLinuxtoolsPath(project);
-
-			if(!currentPath.equals(newPath)){
-				try {
-					OprofileCorePlugin.getDefault().getOpcontrolProvider().deinitModule();
-					currentProject = project;
-					OprofileCorePlugin.getDefault().getOpcontrolProvider().initModule();
-				} catch (OpcontrolException e) {
-					OprofileCorePlugin.showErrorDialog("opcontrolProvider", e); //$NON-NLS-1$
-				}
-				currentProject = project;
-			}
-		}
-	}
-
-	// Initializes static data for oprofile.
-	public static void initializeOprofileCore () {
-		if (isKernelModuleLoaded()){
-			OprofileInfoProvider.info = OprofileInfoProvider.getInfo();
-
-			if (OprofileInfoProvider.info == null) {
-				throw new ExceptionInInitializerError(OprofileProperties.getString("fatal.opinfoNotParsed")); //$NON-NLS-1$
-			}
-		}
-	}
-
-	// initialize oprofile module by calling `opcontrol --init`
-	public static void initializeOprofile() {
 		try {
-			OprofileCorePlugin.getDefault().getOpcontrolProvider().initModule();
+			if(currentProject == null){
+				currentProject = project;
+				initModule();
+			} else {
+				String currentPath = LinuxtoolsPathProperty.getInstance().getLinuxtoolsPath(currentProject);
+				String newPath = LinuxtoolsPathProperty.getInstance().getLinuxtoolsPath(project);
+
+				if (!currentPath.equals(newPath)) {
+						OprofileCorePlugin.getDefault().getOpcontrolProvider().deinitModule();
+						currentProject = project;
+						OprofileCorePlugin.getDefault().getOpcontrolProvider().initModule();
+					currentProject = project;
+				}
+			}
 		} catch (OpcontrolException e) {
 			OprofileCorePlugin.showErrorDialog("opcontrolProvider", e); //$NON-NLS-1$
 		}
 	}
-
-	// This requires more inside knowledge about Oprofile than one would like,
-	// but it is the only way of knowing whether the module is loaded (and we can
-	// succesfully call into the oprofile wrapper library without causing it to print out
-	// a lot of warnings).
-	public static boolean isKernelModuleLoaded() {
-		for (int i = 0; i < OprofileConstants.OPROFILE_CPU_TYPE_FILES.length; ++i) {
-			File f = new File(OprofileConstants.OPROFILE_CPU_TYPE_FILES[i]);
-			if (f.exists())
-				return true;
-		}
-
-		return false;
-	}
-
-	/**
-		 * Initialize the oprofile module
-		 *
-		 * This function will check if the kernel module is
-		 * loaded. If it is not, it will attempt to load it
-		 * (which will cause the system to prompt the user for
-		 * root access).
-		 */
-		public static void initializeOprofileModule() {
-			// Check if kernel module is loaded, if not, try to load it
-			if (!LinuxOpcontrolProvider.isKernelModuleLoaded())
-				LinuxOpcontrolProvider.initializeOprofile();
-
-			//it still may not have loaded, if not, critical error
-			if (!LinuxOpcontrolProvider.isKernelModuleLoaded()) {
-				OprofileCorePlugin.showErrorDialog("oprofileInit", null); //$NON-NLS-1$
-	//			throw new ExceptionInInitializerError(OprofileProperties.getString("fatal.kernelModuleNotLoaded")); //$NON-NLS-1$
-			}  else {
-				LinuxOpcontrolProvider.initializeOprofileCore();
-			}
-		}
 
 	public InputStream runOpHelp(ArrayList<String> args) throws OpcontrolException {
 		args.add(0, "ophelp"); //$NON-NLS-1$
