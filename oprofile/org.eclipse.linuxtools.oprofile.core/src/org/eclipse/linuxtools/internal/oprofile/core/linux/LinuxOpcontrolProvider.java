@@ -424,9 +424,9 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 				String newPath = LinuxtoolsPathProperty.getInstance().getLinuxtoolsPath(project);
 
 				if (!currentPath.equals(newPath)) {
-						OprofileCorePlugin.getDefault().getOpcontrolProvider().deinitModule();
-						currentProject = project;
-						OprofileCorePlugin.getDefault().getOpcontrolProvider().initModule();
+					deinitModule();
+					currentProject = project;
+					initModule();
 					currentProject = project;
 				}
 			}
@@ -448,6 +448,10 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 	}
 
 	protected InputStream runCommand(ArrayList<String> args) throws OpcontrolException {
+		return runCommand(args, true);
+	}
+
+	protected InputStream runCommand(ArrayList<String> args, boolean ignoreStdErr) throws OpcontrolException {
 		final StringBuilder output = new StringBuilder();
 		final StringBuilder errorOutput = new StringBuilder();
 		Thread errReaderThread = null;
@@ -499,7 +503,7 @@ public class LinuxOpcontrolProvider implements IOpcontrolProvider {
 		} catch (InterruptedException e) {
 		}
 
-		if (!errorOutput.toString().trim().equals("")) { //$NON-NLS-1$
+		if (!ignoreStdErr && !errorOutput.toString().trim().equals("")) { //$NON-NLS-1$
 			throw new OpcontrolException(new Status(IStatus.ERROR, OprofileCorePlugin.getId(),
 				NLS.bind(OprofileProperties.getString("command.error.nonEmptyStderr"), args.get(0), errorOutput.toString().trim()))); //$NON-NLS-1$
 		}
